@@ -30,13 +30,6 @@ public class ReprocessorScreen extends AbstractContainerScreen<ReprocessorMenu> 
 
         this.energyInfoArea = new EnergyDisplayTooltipArea(((width - imageWidth) / 2) + 166,
                 ((height - imageHeight) / 2 ) + 18, menu.blockEntity.getEnergyStorage(null), 2, 48);
-
-        addRenderableWidget(
-                Button.builder(Component.literal("Test buton"), (button) -> System.out.println("Pressed"))
-                        .pos(0, 0)
-                        .size(100, 20)
-                        .build()
-        );
     }
 
     @Override

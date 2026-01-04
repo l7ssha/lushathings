@@ -37,6 +37,14 @@ import xyz.l7ssha.lushathings.screen.ReprocessorMenu;
 import java.util.Optional;
 
 public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider {
+    private static final int ENERGY_USAGE_PER_TICK = 50000;
+    private static final int INPUT_SLOT = 0;
+    private static final int OUTPUT_SLOT = 1;
+
+    protected final ContainerData data;
+    private int progress = 0;
+    private int maxProgress = 600;
+
     public final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -57,31 +65,6 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
             }
         }
     };
-
-    public IEnergyStorage getEnergyStorage(@Nullable Direction direction) {
-        return this.energyStorage;
-    }
-    public IItemHandler getInventoryStorage(@Nullable Direction direction) {
-        // TODO: Add configuration from UI
-
-        if (direction == Direction.DOWN) {
-            return new RangedWrapper(itemHandler, 1, 2);
-        }
-
-        if (direction == Direction.UP) {
-            return new RangedWrapper(itemHandler, 0, 1);
-        }
-
-        return EmptyItemHandler.INSTANCE;
-    }
-
-    private static final int ENERGY_USAGE_PER_TICK = 50000;
-    private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 1;
-
-    protected final ContainerData data;
-    private int progress = 0;
-    private int maxProgress = 600;
 
     public ReprocessorBlockEntity(BlockPos pos, BlockState blockState) {
         super(lushathings.REPROCESSOR_BLOCK_ENTITY.get(), pos, blockState);
@@ -109,6 +92,23 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
                 return 2;
             }
         };
+    }
+
+    public IEnergyStorage getEnergyStorage(@Nullable Direction direction) {
+        return this.energyStorage;
+    }
+    public IItemHandler getInventoryStorage(@Nullable Direction direction) {
+        // TODO: Add configuration from UI
+
+        if (direction == Direction.DOWN) {
+            return new RangedWrapper(itemHandler, 1, 2);
+        }
+
+        if (direction == Direction.UP) {
+            return new RangedWrapper(itemHandler, 0, 1);
+        }
+
+        return EmptyItemHandler.INSTANCE;
     }
 
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
@@ -222,6 +222,4 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return saveWithoutMetadata(registries);
     }
-
-
 }
