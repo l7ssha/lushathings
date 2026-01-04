@@ -1,0 +1,12 @@
+{
+  "itemGroup.lushathings": "LushaThings",
+  "block.lushathings.reprocessor_block": "Reprocessor",
+
+  "lushathings.configuration.title": "lusha things Configs",
+  "lushathings.configuration.section.lushathings.common.toml": "lusha things Configs",
+  "lushathings.configuration.section.lushathings.common.toml.title": "lusha things Configs",
+  "lushathings.configuration.items": "Item List",
+  "lushathings.configuration.logDirtBlock": "Log Dirt Block",
+  "lushathings.configuration.magicNumberIntroduction": "Magic Number Text",
+  "lushathings.configuration.magicNumber": "Magic Number"
+}

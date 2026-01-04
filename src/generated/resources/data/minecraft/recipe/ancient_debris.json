@@ -1,0 +1,15 @@
+{
+  "type": "lushathings:reprocessor",
+  "ingredients": [
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "minecraft:netherite_ingot"
+      }
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:ancient_debris"
+  }
+}
