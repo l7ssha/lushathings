@@ -24,8 +24,11 @@ import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
+import net.neoforged.neoforge.items.wrapper.RangedWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.l7ssha.lushathings.EnergyStorageWrapper;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipeInput;
@@ -44,14 +47,32 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
         }
     };
 
-    private final EnergyStorage energyStorage = new EnergyStorage(30000000, 75000, 0);
+    private final EnergyStorage energyStorage = new EnergyStorageWrapper(30000000, 150000) {
+        @Override
+        public void onEnergyChanged() {
+            setChanged();
+
+            if (!level.isClientSide) {
+                getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
+    };
 
     public IEnergyStorage getEnergyStorage(@Nullable Direction direction) {
         return this.energyStorage;
     }
-
     public IItemHandler getInventoryStorage(@Nullable Direction direction) {
-        return this.itemHandler;
+        // TODO: Add configuration from UI
+
+        if (direction == Direction.DOWN) {
+            return new RangedWrapper(itemHandler, 1, 2);
+        }
+
+        if (direction == Direction.UP) {
+            return new RangedWrapper(itemHandler, 0, 1);
+        }
+
+        return EmptyItemHandler.INSTANCE;
     }
 
     private static final int ENERGY_USAGE_PER_TICK = 50000;
