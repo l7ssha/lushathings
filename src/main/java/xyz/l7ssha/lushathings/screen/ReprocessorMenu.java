@@ -10,6 +10,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorBlockEntity;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.util.LushaAbstractContainerMenu;
+import xyz.l7ssha.lushathings.util.SideConfigType;
 
 public class ReprocessorMenu extends LushaAbstractContainerMenu {
     public final ReprocessorBlockEntity blockEntity;
@@ -17,7 +18,7 @@ public class ReprocessorMenu extends LushaAbstractContainerMenu {
     private final ContainerData data;
 
     public ReprocessorMenu(int containerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(containerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos()), new SimpleContainerData(2));
+        this(containerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos()), new SimpleContainerData(16));
     }
 
     public ReprocessorMenu(int containerId, Inventory inventory, BlockEntity blockEntity, ContainerData data) {
@@ -34,6 +35,14 @@ public class ReprocessorMenu extends LushaAbstractContainerMenu {
         this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 1, 104, 34));
 
         addDataSlots(this.data);
+    }
+
+    public boolean isAutoPull() {
+        return this.data.get(14) == 1;
+    }
+
+    public boolean isAutoPush() {
+        return this.data.get(15) == 1;
     }
 
 //    @Override
@@ -56,6 +65,11 @@ public class ReprocessorMenu extends LushaAbstractContainerMenu {
         }
 
         return progress * arrowPixelSize / maxProgress;
+    }
+    
+    public int getSideConfig(SideConfigType type, int directionOrdinal) {
+        int baseIndex = type == SideConfigType.ITEM ? 2 : 8;
+        return this.data.get(baseIndex + directionOrdinal);
     }
 
     @Override

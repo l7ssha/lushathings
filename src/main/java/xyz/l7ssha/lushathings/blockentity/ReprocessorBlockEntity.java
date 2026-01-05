@@ -34,9 +34,14 @@ import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipeInput;
 import xyz.l7ssha.lushathings.screen.ReprocessorMenu;
 
+import xyz.l7ssha.lushathings.util.GenericConfigurableEnergyStorage;
+import xyz.l7ssha.lushathings.util.GenericConfigurableItemHandler;
+import xyz.l7ssha.lushathings.util.ISideConfigurable;
+import xyz.l7ssha.lushathings.util.SideConfigType;
+
 import java.util.Optional;
 
-public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider {
+public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider, ISideConfigurable {
     private static final int ENERGY_USAGE_PER_TICK = 50000;
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 1;
@@ -45,26 +50,25 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
     private int progress = 0;
     private int maxProgress = 600;
 
-    public final ItemStackHandler itemHandler = new ItemStackHandler(2) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            setChanged();
-            if (!level.isClientSide) {
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+    public final GenericConfigurableItemHandler itemHandler = new GenericConfigurableItemHandler(
+            2,
+            new int[]{INPUT_SLOT},
+            new int[]{OUTPUT_SLOT},
+            () -> {
+                setChanged();
+                if (level != null && !level.isClientSide) {
+                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                }
             }
-        }
-    };
+    );
 
-    private final EnergyStorage energyStorage = new EnergyStorageWrapper(30000000, 150000) {
-        @Override
-        public void onEnergyChanged() {
-            setChanged();
+    private final GenericConfigurableEnergyStorage energyStorage = new GenericConfigurableEnergyStorage(30000000, 150000, 0, () -> {
+        setChanged();
 
-            if (!level.isClientSide) {
-                getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
+        if (level != null && !level.isClientSide) {
+            getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
-    };
+    });
 
     public ReprocessorBlockEntity(BlockPos pos, BlockState blockState) {
         super(lushathings.REPROCESSOR_BLOCK_ENTITY.get(), pos, blockState);
@@ -75,6 +79,20 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
                 return switch (i) {
                     case 0 -> ReprocessorBlockEntity.this.progress;
                     case 1 -> ReprocessorBlockEntity.this.maxProgress;
+                    case 2 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[0];
+                    case 3 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[1];
+                    case 4 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[2];
+                    case 5 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[3];
+                    case 6 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[4];
+                    case 7 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[5];
+                    case 8 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[0];
+                    case 9 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[1];
+                    case 10 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[2];
+                    case 11 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[3];
+                    case 12 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[4];
+                    case 13 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[5];
+                    case 14 -> ReprocessorBlockEntity.this.itemHandler.isAutoPull() ? 1 : 0;
+                    case 15 -> ReprocessorBlockEntity.this.itemHandler.isAutoPush() ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -84,34 +102,61 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
                 switch (i) {
                     case 0 -> ReprocessorBlockEntity.this.progress = value;
                     case 1 -> ReprocessorBlockEntity.this.maxProgress = value;
+                    case 2 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[0] = value;
+                    case 3 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[1] = value;
+                    case 4 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[2] = value;
+                    case 5 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[3] = value;
+                    case 6 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[4] = value;
+                    case 7 -> ReprocessorBlockEntity.this.itemHandler.getSideConfig()[5] = value;
+                    case 8 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[0] = value;
+                    case 9 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[1] = value;
+                    case 10 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[2] = value;
+                    case 11 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[3] = value;
+                    case 12 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[4] = value;
+                    case 13 -> ReprocessorBlockEntity.this.energyStorage.getSideConfig()[5] = value;
+                    case 14 -> ReprocessorBlockEntity.this.itemHandler.setAutoPull(value == 1);
+                    case 15 -> ReprocessorBlockEntity.this.itemHandler.setAutoPush(value == 1);
                 }
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 16;
             }
         };
     }
 
     public IEnergyStorage getEnergyStorage(@Nullable Direction direction) {
-        return this.energyStorage;
+        return energyStorage.getSideStorage(direction);
     }
+    
     public IItemHandler getInventoryStorage(@Nullable Direction direction) {
-        // TODO: Add configuration from UI
+        return itemHandler.getSideHandler(direction);
+    }
 
-        if (direction == Direction.DOWN) {
-            return new RangedWrapper(itemHandler, 1, 2);
+    @Override
+    public void cycleSideConfig(SideConfigType type, Direction direction) {
+        if (type == SideConfigType.ITEM) {
+            itemHandler.cycleSideConfig(direction);
+        } else if (type == SideConfigType.ENERGY) {
+            energyStorage.cycleSideConfig(direction);
         }
-
-        if (direction == Direction.UP) {
-            return new RangedWrapper(itemHandler, 0, 1);
+    }
+    
+    public int getSideConfig(SideConfigType type, Direction direction) {
+        if (type == SideConfigType.ITEM) {
+            return itemHandler.getSideConfig(direction);
+        } else if (type == SideConfigType.ENERGY) {
+            return energyStorage.getSideConfig(direction);
         }
-
-        return EmptyItemHandler.INSTANCE;
+        return 0;
     }
 
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
+        if (level != null && !level.isClientSide) {
+            itemHandler.tick(level, blockPos);
+        }
+
         if (this.itemHandler.getStackInSlot(0).isEmpty()) {
             this.progress = 0;
 
@@ -210,7 +255,9 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider 
         itemHandler.deserializeNBT(registries, tag.getCompound("reprocessor.inventory"));
         progress = tag.getInt("reprocessor.progress");
         maxProgress = tag.getInt("reprocessor.maxProgress");
-        energyStorage.deserializeNBT(registries, tag.get("reprocessor.energy"));
+        if (tag.contains("reprocessor.energy")) {
+            energyStorage.deserializeNBT(registries, tag.get("reprocessor.energy"));
+        }
     }
 
     @Override
