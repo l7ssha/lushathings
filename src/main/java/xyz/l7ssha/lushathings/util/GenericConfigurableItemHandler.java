@@ -46,12 +46,13 @@ public class GenericConfigurableItemHandler extends ItemStackHandler {
                 IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
                 if (neighbor != null) {
                     for (int slot = 0; slot < neighbor.getSlots(); slot++) {
-                        ItemStack extracted = neighbor.extractItem(slot, 64, true);
+                        ItemStack extracted = neighbor.extractItem(slot, 1, true);
                         if (!extracted.isEmpty()) {
                             ItemStack remainder = ItemHandlerHelper.insertItem(this, extracted, false);
                             int amountTaken = extracted.getCount() - remainder.getCount();
                             if (amountTaken > 0) {
                                 neighbor.extractItem(slot, amountTaken, false);
+                                break;
                             }
                         }
                     }
@@ -65,9 +66,12 @@ public class GenericConfigurableItemHandler extends ItemStackHandler {
                     for (int slot : outputSlots) {
                         ItemStack stack = getStackInSlot(slot);
                         if (!stack.isEmpty()) {
-                            ItemStack remainder = ItemHandlerHelper.insertItem(neighbor, stack.copy(), false);
-                            if (remainder.getCount() < stack.getCount()) {
-                                setStackInSlot(slot, remainder);
+                            ItemStack toPush = stack.copyWithCount(1);
+                            ItemStack remainder = ItemHandlerHelper.insertItem(neighbor, toPush, false);
+                            int pushed = 1 - remainder.getCount();
+                            if (pushed > 0) {
+                                extractItem(slot, pushed, false);
+                                break;
                             }
                         }
                     }
