@@ -14,10 +14,13 @@ import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiPredicate;
+
 public class GenericConfigurableItemHandler extends ItemStackHandler {
     private final int[] inputSlots;
     private final int[] outputSlots;
     private final Runnable onContentsChanged;
+    private final BiPredicate<Integer, ItemStack> validator;
 
     private boolean autoPull = false;
     private boolean autoPush = false;
@@ -26,11 +29,12 @@ public class GenericConfigurableItemHandler extends ItemStackHandler {
     // Index corresponds to Direction.ordinal()
     private final int[] sideConfig = new int[]{0, 0, 0, 0, 0, 0};
 
-    public GenericConfigurableItemHandler(int size, int[] inputSlots, int[] outputSlots, Runnable onContentsChanged) {
+    public GenericConfigurableItemHandler(int size, int[] inputSlots, int[] outputSlots, Runnable onContentsChanged, BiPredicate<Integer, ItemStack> validator) {
         super(size);
         this.inputSlots = inputSlots;
         this.outputSlots = outputSlots;
         this.onContentsChanged = onContentsChanged;
+        this.validator = validator;
     }
 
     public void tick(Level level, BlockPos pos) {
@@ -107,6 +111,10 @@ public class GenericConfigurableItemHandler extends ItemStackHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        if (validator != null && !validator.test(slot, stack)) {
+            return false;
+        }
+
         for (int inputSlot : inputSlots) {
             if (slot == inputSlot) return true;
         }
@@ -153,7 +161,7 @@ public class GenericConfigurableItemHandler extends ItemStackHandler {
     public int getSideConfig(Direction direction) {
         return sideConfig[direction.ordinal()];
     }
-    
+
     public int[] getSideConfig() {
         return sideConfig;
     }

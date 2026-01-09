@@ -22,15 +22,25 @@ import java.util.Map;
 public class ReprocessorRecipeBuilder implements RecipeBuilder {
     private final NonNullList<SizedIngredient> ingredients = NonNullList.create();
     private final ItemStack result;
+    private final ItemStack result2;
+    private final int craftingTime;
+    private final int energyCost;
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
 
-    public ReprocessorRecipeBuilder(ItemStack result) {
+    public ReprocessorRecipeBuilder(ItemStack result, ItemStack result2, int craftingTime, int energyCost) {
         this.result = result;
+        this.result2 = result2;
+        this.craftingTime = craftingTime;
+        this.energyCost = energyCost;
     }
 
     // Static helper to make provider code cleaner
-    public static ReprocessorRecipeBuilder create(ItemStack result) {
-        return new ReprocessorRecipeBuilder(result);
+    public static ReprocessorRecipeBuilder create(ItemStack result, int craftingTime, int energyCost) {
+        return new ReprocessorRecipeBuilder(result, ItemStack.EMPTY, craftingTime, energyCost);
+    }
+
+    public static ReprocessorRecipeBuilder create(ItemStack result, ItemStack result2, int craftingTime, int energyCost) {
+        return new ReprocessorRecipeBuilder(result, result2, craftingTime, energyCost);
     }
 
     public ReprocessorRecipeBuilder addInput(Ingredient ingredient, int count) {
@@ -63,7 +73,7 @@ public class ReprocessorRecipeBuilder implements RecipeBuilder {
 
         this.criteria.forEach(advancementBuilder::addCriterion);
 
-        ReprocessorRecipe recipe = new ReprocessorRecipe(this.ingredients, this.result);
+        ReprocessorRecipe recipe = new ReprocessorRecipe(this.ingredients, this.result, this.result2, this.craftingTime, this.energyCost);
         output.accept(id, recipe, advancementBuilder.build(id.withPrefix("recipes/")));
     }
 }

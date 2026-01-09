@@ -35,7 +35,7 @@ public class ReprocessorScreen extends AbstractContainerScreen<ReprocessorMenu> 
         super.init();
 
         this.energyInfoArea = new EnergyDisplayTooltipArea(((width - imageWidth) / 2) + 166,
-                ((height - imageHeight) / 2 ) + 18, menu.blockEntity.getEnergyStorage(null), 2, 48);
+                ((height - imageHeight) / 2 ) + 18, menu.blockEntity.getEnergyStorage(null), 4, 48);
         
         // Add buttons for each side
         int x = (width - imageWidth) / 2;

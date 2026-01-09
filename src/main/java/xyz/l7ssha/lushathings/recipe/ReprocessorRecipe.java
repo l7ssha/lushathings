@@ -1,5 +1,6 @@
 package xyz.l7ssha.lushathings.recipe;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.Level;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 
-public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack output) implements Recipe<ReprocessorRecipeInput> {
+public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack output, ItemStack output2, int craftingTime, int energyCost) implements Recipe<ReprocessorRecipeInput> {
     @Override
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
@@ -33,20 +34,19 @@ public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack o
             return false;
         }
 
-        if (reprocessorRecipeInput.size() < inputs.size()) {
-            return false;
+        if (inputs.size() == 1) {
+            ItemStack slot1 = reprocessorRecipeInput.getItem(0);
+            ItemStack slot2 = reprocessorRecipeInput.getItem(1);
+
+            return inputs.getFirst().test(slot1) && slot2.isEmpty();
+        } else if (inputs.size() == 2) {
+             ItemStack slot1 = reprocessorRecipeInput.getItem(0);
+             ItemStack slot2 = reprocessorRecipeInput.getItem(1);
+
+             return inputs.getFirst().test(slot1) && inputs.get(1).test(slot2);
         }
 
-        for (int i = 0; i < inputs.size(); i++) {
-            SizedIngredient required = inputs.get(i);
-            ItemStack provided = reprocessorRecipeInput.getItem(i);
-
-            if (!required.test(provided)) {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
     }
 
     @Override
@@ -61,7 +61,7 @@ public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack o
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return null;
+        return output != null ? output : ItemStack.EMPTY;
     }
 
     @Override
@@ -77,11 +77,14 @@ public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack o
     public static class Serializer implements RecipeSerializer<ReprocessorRecipe> {
         public static final MapCodec<ReprocessorRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 SizedIngredient.CODEC.listOf().fieldOf("ingredients").forGetter(ReprocessorRecipe::inputs),
-                ItemStack.CODEC.fieldOf("result").forGetter(ReprocessorRecipe::output)
-        ).apply(inst, (ingredients, result) -> {
+                ItemStack.CODEC.fieldOf("result").forGetter(ReprocessorRecipe::output),
+                ItemStack.CODEC.optionalFieldOf("result_aux", ItemStack.EMPTY).forGetter(ReprocessorRecipe::output2),
+                Codec.INT.fieldOf("crafting_time").forGetter(ReprocessorRecipe::craftingTime),
+                Codec.INT.fieldOf("energy_cost").forGetter(ReprocessorRecipe::energyCost)
+        ).apply(inst, (ingredients, result, result2, craftingTime, energyCost) -> {
             NonNullList<SizedIngredient> inputs = NonNullList.create();
             inputs.addAll(ingredients);
-            return new ReprocessorRecipe(inputs, result);
+            return new ReprocessorRecipe(inputs, result, result2, craftingTime, energyCost);
         }));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, ReprocessorRecipe> STREAM_CODEC = StreamCodec.composite(
@@ -89,6 +92,12 @@ public record ReprocessorRecipe(NonNullList<SizedIngredient> inputs, ItemStack o
                 ReprocessorRecipe::inputs,
                 ItemStack.STREAM_CODEC,
                 ReprocessorRecipe::output,
+                ItemStack.OPTIONAL_STREAM_CODEC,
+                ReprocessorRecipe::output2,
+                ByteBufCodecs.INT,
+                ReprocessorRecipe::craftingTime,
+                ByteBufCodecs.INT,
+                ReprocessorRecipe::energyCost,
                 ReprocessorRecipe::new
         );
 

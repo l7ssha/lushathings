@@ -1,0 +1,23 @@
+{
+  "type": "lushathings:reprocessor",
+  "crafting_time": 300,
+  "energy_cost": 20000,
+  "ingredients": [
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:obsidian"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "minecraft:ghast_tear"
+      }
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:crying_obsidian"
+  }
+}

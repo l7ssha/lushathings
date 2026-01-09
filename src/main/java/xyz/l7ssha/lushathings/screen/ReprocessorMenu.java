@@ -31,8 +31,10 @@ public class ReprocessorMenu extends LushaAbstractContainerMenu {
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
 
-        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 0, 54, 34));
-        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 1, 104, 34));
+        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 0, 57, 19));
+        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 1, 57, 46));
+        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 2, 104, 27));
+        this.addSlot(new SlotItemHandler(this.blockEntity.itemHandler, 3, 104, 45));
 
         addDataSlots(this.data);
     }

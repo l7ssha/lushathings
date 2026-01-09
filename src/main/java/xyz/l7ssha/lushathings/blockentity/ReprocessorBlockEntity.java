@@ -44,23 +44,15 @@ import java.util.Optional;
 public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider, ISideConfigurable {
     private static final int ENERGY_USAGE_PER_TICK = 50000;
     private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 1;
+    private static final int INPUT_SLOT_2 = 1;
+    private static final int OUTPUT_SLOT = 2;
+    private static final int OUTPUT_SLOT_2 = 3;
 
     protected final ContainerData data;
     private int progress = 0;
     private int maxProgress = 600;
 
-    public final GenericConfigurableItemHandler itemHandler = new GenericConfigurableItemHandler(
-            2,
-            new int[]{INPUT_SLOT},
-            new int[]{OUTPUT_SLOT},
-            () -> {
-                setChanged();
-                if (level != null && !level.isClientSide) {
-                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                }
-            }
-    );
+    public final GenericConfigurableItemHandler itemHandler;
 
     private final GenericConfigurableEnergyStorage energyStorage = new GenericConfigurableEnergyStorage(30000000, 150000, 0, () -> {
         setChanged();
@@ -72,6 +64,36 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
 
     public ReprocessorBlockEntity(BlockPos pos, BlockState blockState) {
         super(lushathings.REPROCESSOR_BLOCK_ENTITY.get(), pos, blockState);
+
+        this.itemHandler = new GenericConfigurableItemHandler(
+                4,
+                new int[]{INPUT_SLOT, INPUT_SLOT_2},
+                new int[]{OUTPUT_SLOT, OUTPUT_SLOT_2},
+                () -> {
+                    setChanged();
+                    if (level != null && !level.isClientSide) {
+                        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                    }
+                },
+                (slot, stack) -> {
+                    if (level == null) {
+                        return true;
+                    }
+
+                    if (slot == INPUT_SLOT) {
+                        var recipes = level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
+                        return recipes.stream().anyMatch(recipe ->
+                                recipe.value().inputs().getFirst().test(stack)
+                        );
+                    }
+
+                    if (slot == INPUT_SLOT_2) {
+                        return isValidInputSlot2(stack);
+                    }
+
+                    return true;
+                }
+        );
 
         data = new ContainerData() {
             @Override
@@ -129,7 +151,7 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
     public IEnergyStorage getEnergyStorage(@Nullable Direction direction) {
         return energyStorage.getSideStorage(direction);
     }
-    
+
     public IItemHandler getInventoryStorage(@Nullable Direction direction) {
         return itemHandler.getSideHandler(direction);
     }
@@ -142,7 +164,7 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
             energyStorage.cycleSideConfig(direction);
         }
     }
-    
+
     public int getSideConfig(SideConfigType type, Direction direction) {
         if (type == SideConfigType.ITEM) {
             return itemHandler.getSideConfig(direction);
@@ -152,12 +174,27 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
         return 0;
     }
 
+    public boolean isValidInputSlot2(ItemStack stack) {
+        if (itemHandler == null) return true;
+        ItemStack slot0Stack = itemHandler.getStackInSlot(INPUT_SLOT);
+        if (slot0Stack.isEmpty()) {
+            return false;
+        }
+
+        var recipes = level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
+        return recipes.stream().anyMatch(recipe ->
+                recipe.value().inputs().size() > 1 &&
+                        recipe.value().inputs().getFirst().test(slot0Stack) &&
+                        recipe.value().inputs().get(1).test(stack)
+        );
+    }
+
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
         if (level != null && !level.isClientSide) {
             itemHandler.tick(level, blockPos);
         }
 
-        if (this.itemHandler.getStackInSlot(0).isEmpty()) {
+        if (this.itemHandler.getStackInSlot(INPUT_SLOT).isEmpty()) {
             this.progress = 0;
 
             return;
@@ -167,8 +204,16 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
             return;
         }
 
+        Optional<RecipeHolder<ReprocessorRecipe>> currentRecipe = getCurrentRecipe();
+        if (currentRecipe.isEmpty()) {
+            return;
+        }
+
+        ReprocessorRecipe recipe = currentRecipe.get().value();
+        this.maxProgress = recipe.craftingTime();
+
         progress++;
-        energyStorage.extractEnergy(ENERGY_USAGE_PER_TICK, false);
+        energyStorage.extractEnergy(recipe.energyCost(), false);
 
         if (progress >= maxProgress) {
             progress = 0;
@@ -184,10 +229,19 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
             return;
         }
 
-        ItemStack output = currentRecipe.get().value().output();
+        ReprocessorRecipe recipe = currentRecipe.get().value();
+        ItemStack output = recipe.output();
+        ItemStack output2 = recipe.output2();
 
-        itemHandler.extractItem(INPUT_SLOT, currentRecipe.get().value().inputs().getFirst().count(), false);
+        itemHandler.extractItem(INPUT_SLOT, recipe.inputs().getFirst().count(), false);
+        if (recipe.inputs().size() > 1) {
+             itemHandler.extractItem(INPUT_SLOT_2, recipe.inputs().get(1).count(), false);
+        }
         itemHandler.setStackInSlot(OUTPUT_SLOT, output.copyWithCount(itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + output.getCount()));
+
+        if (!output2.isEmpty()) {
+             itemHandler.setStackInSlot(OUTPUT_SLOT_2, output2.copyWithCount(itemHandler.getStackInSlot(OUTPUT_SLOT_2).getCount() + output2.getCount()));
+        }
     }
 
     private boolean canCraft() {
@@ -195,25 +249,39 @@ public class ReprocessorBlockEntity extends BlockEntity implements MenuProvider,
         if (currentRecipe.isEmpty()) {
             return false;
         }
+        
+        ReprocessorRecipe recipe = currentRecipe.get().value();
 
-        if (this.energyStorage.getEnergyStored() <= ENERGY_USAGE_PER_TICK) {
+        if (this.energyStorage.getEnergyStored() < recipe.energyCost()) {
             return false;
         }
 
-        ItemStack recipeOutput = currentRecipe.get().value().output();
-        ItemStack outputStack = itemHandler.getStackInSlot(OUTPUT_SLOT);
+        ItemStack recipeOutput = recipe.output();
+        ItemStack recipeOutput2 = recipe.output2();
 
-        return itemHandler.getStackInSlot(INPUT_SLOT).getCount() >= currentRecipe.get().value().inputs().getFirst().count()
-                && (outputStack.isEmpty() || (
-                outputStack.getItem() == recipeOutput.getItem() &&
-                        outputStack.getCount() + recipeOutput.getCount() <= 64
-        ));
+        ItemStack outputStack = itemHandler.getStackInSlot(OUTPUT_SLOT);
+        ItemStack outputStack2 = itemHandler.getStackInSlot(OUTPUT_SLOT_2);
+
+        boolean input1Valid = itemHandler.getStackInSlot(INPUT_SLOT).getCount() >= recipe.inputs().getFirst().count();
+        boolean input2Valid = true;
+        if (recipe.inputs().size() > 1) {
+             input2Valid = itemHandler.getStackInSlot(INPUT_SLOT_2).getCount() >= recipe.inputs().get(1).count();
+        }
+
+        boolean output1Valid = outputStack.isEmpty() || (outputStack.getItem() == recipeOutput.getItem() && outputStack.getCount() + recipeOutput.getCount() <= 64);
+        boolean output2Valid = true;
+
+        if (!recipeOutput2.isEmpty()) {
+             output2Valid = outputStack2.isEmpty() || (outputStack2.getItem() == recipeOutput2.getItem() && outputStack2.getCount() + recipeOutput2.getCount() <= 64);
+        }
+
+        return input1Valid && input2Valid && output1Valid && output2Valid;
     }
 
     private Optional<RecipeHolder<ReprocessorRecipe>> getCurrentRecipe() {
         return this.level.getRecipeManager().getRecipeFor(
                 lushathings.REPROCESSOR_RECIPE_TYPE.get(),
-                new ReprocessorRecipeInput(itemHandler.getStackInSlot(0)),
+                new ReprocessorRecipeInput(itemHandler.getStackInSlot(INPUT_SLOT), itemHandler.getStackInSlot(INPUT_SLOT_2)),
                 level
         );
     }

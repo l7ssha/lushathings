@@ -34,8 +34,21 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_netherite_ingot", has(Items.NETHERITE_INGOT))
                 .save(output);
 
-        new ReprocessorRecipeBuilder(new ItemStack(Items.ANCIENT_DEBRIS))
+        new ReprocessorRecipeBuilder(new ItemStack(Items.ANCIENT_DEBRIS), new ItemStack(Items.GOLD_INGOT), 600, 50000)
                 .addInput(Ingredient.of(Items.NETHERITE_INGOT), 4)
+                .addInput(Ingredient.of(Items.NETHERRACK), 16)
+                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
+                .save(output);
+
+        ReprocessorRecipeBuilder.create(new ItemStack(Items.CRYING_OBSIDIAN), 300, 20000)
+                .addInput(Ingredient.of(Items.OBSIDIAN), 1)
+                .addInput(Ingredient.of(Items.GHAST_TEAR), 4)
+                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
+                .save(output);
+
+        ReprocessorRecipeBuilder.create(new ItemStack(Items.COBWEB), 100, 5000)
+                .addInput(Ingredient.of(Items.STRING), 16)
+                .addInput(Ingredient.of(Items.SLIME_BALL), 2)
                 .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
                 .save(output);
     }
