@@ -13,7 +13,8 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        blockWithItem(lushathings.REPROCESSOR_BLOCK);
+        blockWithItem(lushathings.REPROCESSOR_CONTROLLER_BLOCK);
+        blockWithItem(lushathings.REPROCESSOR_STRUCTURE_BLOCK);
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock) {

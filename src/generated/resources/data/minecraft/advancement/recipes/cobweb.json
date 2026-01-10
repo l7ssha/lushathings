@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "lushathings:reprocessor_block"
+            "items": "lushathings:reprocessor_controller_block"
           }
         ]
       },

@@ -9,6 +9,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import org.jetbrains.annotations.NotNull;
 import xyz.l7ssha.lushathings.datagen.builder.ReprocessorRecipeBuilder;
@@ -23,7 +24,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_BLOCK.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_CONTROLLER_BLOCK.get())
                 .pattern("GGG")
                 .pattern("F F")
                 .pattern("NCN")
@@ -37,19 +38,19 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         new ReprocessorRecipeBuilder(new ItemStack(Items.ANCIENT_DEBRIS), new ItemStack(Items.GOLD_INGOT), 600, 50000)
                 .addInput(Ingredient.of(Items.NETHERITE_INGOT), 4)
                 .addInput(Ingredient.of(Items.NETHERRACK), 16)
-                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
+                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get().asItem()))
                 .save(output);
 
         ReprocessorRecipeBuilder.create(new ItemStack(Items.CRYING_OBSIDIAN), 300, 20000)
                 .addInput(Ingredient.of(Items.OBSIDIAN), 1)
                 .addInput(Ingredient.of(Items.GHAST_TEAR), 4)
-                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
+                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get().asItem()))
                 .save(output);
 
         ReprocessorRecipeBuilder.create(new ItemStack(Items.COBWEB), 100, 5000)
                 .addInput(Ingredient.of(Items.STRING), 16)
                 .addInput(Ingredient.of(Items.SLIME_BALL), 2)
-                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_BLOCK.get().asItem()))
+                .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get().asItem()))
                 .save(output);
     }
 }

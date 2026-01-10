@@ -10,8 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.IContainerFactory;
@@ -33,13 +31,11 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorBlockEntity;
-import xyz.l7ssha.lushathings.blocks.ReprocessorBlock;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
+import xyz.l7ssha.lushathings.blocks.ReprocessorControllerBlock;
+import xyz.l7ssha.lushathings.blocks.ReprocessorStructureBlock;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
-import xyz.l7ssha.lushathings.screen.ReprocessorMenu;
-import xyz.l7ssha.lushathings.screen.ReprocessorScreen;
 
-import java.awt.*;
 import java.util.function.Supplier;
 
 @Mod(lushathings.MODID)
@@ -67,13 +63,15 @@ public class lushathings {
                 }
             });
 
-    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorMenu>> REPROCESSOR_MENU =
-            registerMenuType("reprocessor_menu", ReprocessorMenu::new);
+//    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorMenu>> REPROCESSOR_MENU =
+//            registerMenuType("reprocessor_menu", ReprocessorMenu::new);
 
-    public static final DeferredBlock<Block> REPROCESSOR_BLOCK = registerBlock("reprocessor_block", () -> new ReprocessorBlock(BlockBehaviour.Properties.of()));
-    public static final Supplier<BlockEntityType<ReprocessorBlockEntity>> REPROCESSOR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
-            "reprocessor_block_entity",
-            () -> BlockEntityType.Builder.of(ReprocessorBlockEntity::new, REPROCESSOR_BLOCK.get()).build(null)
+    public static final DeferredBlock<Block> REPROCESSOR_CONTROLLER_BLOCK = registerBlock("reprocessor_controller_block", () -> new ReprocessorControllerBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_STRUCTURE_BLOCK = registerBlock("reprocessor_structure_block", () -> new ReprocessorStructureBlock(BlockBehaviour.Properties.of()));
+
+    public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "reprocessor_controller_block_entity",
+            () -> BlockEntityType.Builder.of(ReprocessorControllerBlockEntity::new, REPROCESSOR_CONTROLLER_BLOCK.get()).build(null)
     );
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
@@ -91,12 +89,13 @@ public class lushathings {
         ITEMS.register(name, () -> new BlockItem(registeredBlock.get(), new Item.Properties()));
     }
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("lushathings_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.lushathings"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> REPROCESSOR_BLOCK.get().asItem().getDefaultInstance())
+            .icon(() -> REPROCESSOR_CONTROLLER_BLOCK.get().asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(REPROCESSOR_BLOCK.get());
+                output.accept(REPROCESSOR_CONTROLLER_BLOCK.get());
+                output.accept(REPROCESSOR_STRUCTURE_BLOCK.get());
             }).build());
 
     public lushathings(IEventBus modEventBus, ModContainer modContainer) {

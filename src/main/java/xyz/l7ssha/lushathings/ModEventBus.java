@@ -9,7 +9,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorBlockEntity;
 import xyz.l7ssha.lushathings.datagen.ModBlockStateProvider;
 import xyz.l7ssha.lushathings.datagen.ModRecipeProvider;
 
@@ -33,8 +32,8 @@ public class ModEventBus {
 
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, lushathings.REPROCESSOR_BLOCK_ENTITY.get(), ReprocessorBlockEntity::getEnergyStorage);
-
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_BLOCK_ENTITY.get(), ReprocessorBlockEntity::getInventoryStorage);
+        // TODO: Register proper capabilities
+//        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, lushathings.REPROCESSOR_CONTROLLER_BLOCK_ENTITY.get(), ReprocessorBlockEntity::getEnergyStorage);
+//        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_CONTROLLER_BLOCK_ENTITY.get(), ReprocessorBlockEntity::getInventoryStorage);
     }
 }

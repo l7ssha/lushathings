@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "lushathings:reprocessor_block"
+        "recipe": "lushathings:reprocessor_controller_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "lushathings:reprocessor_block"
+      "lushathings:reprocessor_controller_block"
     ]
   }
 }

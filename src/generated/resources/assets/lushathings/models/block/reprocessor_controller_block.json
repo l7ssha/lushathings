@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "lushathings:block/reprocessor_block"
+    "all": "lushathings:block/reprocessor_controller_block"
   }
 }

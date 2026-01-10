@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lushathings:block/reprocessor_structure_block"
+    }
+  }
+}
