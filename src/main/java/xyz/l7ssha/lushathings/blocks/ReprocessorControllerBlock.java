@@ -2,7 +2,6 @@ package xyz.l7ssha.lushathings.blocks;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -16,18 +15,17 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
 
 public class ReprocessorControllerBlock extends BaseEntityBlock implements ReprocessorMultiblock {
     public static final MapCodec<ReprocessorControllerBlock> CODEC = simpleCodec(ReprocessorControllerBlock::new);
-    public static final BooleanProperty MUTLIBLOCK_FORMED = BooleanProperty.create("multiblock_formed");
 
     public ReprocessorControllerBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(MUTLIBLOCK_FORMED, false));
     }
 
     @Override
@@ -62,20 +60,16 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
             return ItemInteractionResult.SUCCESS;
         }
 
-        Direction insideDir = hitResult.getDirection().getOpposite();
-        BlockPos cubeCenter = pos.relative(insideDir);
+        BlockPos cubeCenter = pos.relative(hitResult.getDirection().getOpposite());
 
         if (isAreaValid(level, cubeCenter)) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ReprocessorControllerBlockEntity controllerBe) {
-                controllerBe.setCenterPos(cubeCenter);
-
+            if (level.getBlockEntity(pos) instanceof ReprocessorControllerBlockEntity be) {
+                be.setCenterPos(cubeCenter);
                 formArea(level, cubeCenter, true);
-
-                player.displayClientMessage(Component.literal("Formed multiblock successfully!"), true);
+                player.displayClientMessage(Component.literal("Multiblock Formed!"), true);
             }
         } else {
-            player.displayClientMessage(Component.literal("Incomplete structure: Needs a 3x3x3 of multiblock parts."), true);
+            player.displayClientMessage(Component.literal("Structure incomplete!"), true);
         }
 
         return ItemInteractionResult.SUCCESS;
@@ -84,9 +78,8 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ReprocessorControllerBlockEntity controllerBe) {
-                BlockPos center = controllerBe.getCenterPos();
+            if (level.getBlockEntity(pos) instanceof ReprocessorControllerBlockEntity be) {
+                BlockPos center = be.getCenterPos();
                 if (center != null) {
                     formArea(level, center, false);
                 }
@@ -104,17 +97,14 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
         return true;
     }
 
-    private void formArea(Level level, BlockPos center, boolean formed) {
+    public void formArea(Level level, BlockPos center, boolean formed) {
         for (BlockPos target : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
-            BlockState targetState = level.getBlockState(target);
-            if (targetState.getBlock() instanceof ReprocessorMultiblock multiblock) {
-                multiblock.manipulateMutliblock(level, targetState, target, formed);
+            BlockState state = level.getBlockState(target);
+
+            if (state.getBlock() instanceof ReprocessorMultiblock multiblock) {
+                BlockState newState = state.setValue(MUTLIBLOCK_FORMED, formed);
+                multiblock.manipulateMutliblock(level, newState, target.immutable(), formed);
             }
         }
-    }
-
-    @Override
-    public void manipulateMutliblock(Level level, BlockState currentBlockState, BlockPos blockPos, boolean flag) {
-        level.setBlockAndUpdate(blockPos, currentBlockState.setValue(MUTLIBLOCK_FORMED, flag));
     }
 }

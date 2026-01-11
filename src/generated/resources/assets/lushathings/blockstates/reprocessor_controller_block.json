@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "multiblock_formed=false": {
       "model": "lushathings:block/reprocessor_controller_block"
+    },
+    "multiblock_formed=true": {
+      "model": "lushathings:block/reprocessor_controller_block_formed"
     }
   }
 }
