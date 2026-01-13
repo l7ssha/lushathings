@@ -35,7 +35,7 @@ public class ReprocessorStructureBlock extends Block implements ReprocessorMulti
                     if (level.getBlockEntity(checkPos) instanceof ReprocessorControllerBlockEntity be) {
                         BlockPos center = be.getCenterPos();
                         if (center != null) {
-                            controller.formArea(level, center, false);
+                            controller.formArea(level, center, false, be);
                             be.setCenterPos(null);
                         }
                     }

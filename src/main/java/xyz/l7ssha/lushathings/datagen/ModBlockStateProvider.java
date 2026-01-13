@@ -17,6 +17,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         setupFormedVariant(lushathings.REPROCESSOR_CONTROLLER_BLOCK);
         setupFormedVariant(lushathings.REPROCESSOR_STRUCTURE_BLOCK);
+        setupFormedVariant(lushathings.REPROCESSOR_INPUT_BLOCK);
+        setupFormedVariant(lushathings.REPROCESSOR_OUTPUT_BLOCK);
+        setupFormedVariant(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK);
     }
 
     private void setupFormedVariant(DeferredBlock<? extends Block> deferred) {

@@ -2,6 +2,12 @@
   "itemGroup.lushathings": "LushaThings",
   "block.lushathings.reprocessor_block": "Reprocessor",
 
+  "block.lushathings.reprocessor_input_block": "Reprocessor Input Hatch",
+  "block.lushathings.reprocessor_output_block": "Reprocessor Output Hatch",
+  "block.lushathings.reprocessor_energy_input_block": "Reprocessor Energy Input",
+  "menu.lushathings.reprocessor_hatch": "Reprocessor Hatch",
+  "menu.lushathings.reprocessor_energy_input": "Reprocessor Energy Input",
+
   "lushathings.configuration.title": "lusha things Configs",
   "lushathings.configuration.section.lushathings.common.toml": "lusha things Configs",
   "lushathings.configuration.section.lushathings.common.toml.title": "lusha things Configs",

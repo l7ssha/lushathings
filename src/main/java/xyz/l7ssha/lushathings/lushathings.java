@@ -3,6 +3,7 @@ package xyz.l7ssha.lushathings;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -32,9 +33,18 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorEnergyInputBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
 import xyz.l7ssha.lushathings.blocks.ReprocessorControllerBlock;
+import xyz.l7ssha.lushathings.blocks.ReprocessorEnergyInputBlock;
+import xyz.l7ssha.lushathings.blocks.ReprocessorInputBlock;
+import xyz.l7ssha.lushathings.blocks.ReprocessorOutputBlock;
 import xyz.l7ssha.lushathings.blocks.ReprocessorStructureBlock;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
+import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
+import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
+import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 
 import java.util.function.Supplier;
 
@@ -66,12 +76,36 @@ public class lushathings {
 //    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorMenu>> REPROCESSOR_MENU =
 //            registerMenuType("reprocessor_menu", ReprocessorMenu::new);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorHatchMenu>> REPROCESSOR_HATCH_MENU =
+            registerMenuType("reprocessor_hatch_menu", ReprocessorHatchMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorControllerMenu>> REPROCESSOR_CONTROLLER_MENU =
+            registerMenuType("reprocessor_controller_menu", ReprocessorControllerMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorEnergyInputMenu>> REPROCESSOR_ENERGY_INPUT_MENU =
+            registerMenuType("reprocessor_energy_input_menu", ReprocessorEnergyInputMenu::new);
+
     public static final DeferredBlock<Block> REPROCESSOR_CONTROLLER_BLOCK = registerBlock("reprocessor_controller_block", () -> new ReprocessorControllerBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_STRUCTURE_BLOCK = registerBlock("reprocessor_structure_block", () -> new ReprocessorStructureBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_INPUT_BLOCK = registerBlock("reprocessor_input_block", () -> new ReprocessorInputBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_OUTPUT_BLOCK = registerBlock("reprocessor_output_block", () -> new ReprocessorOutputBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_ENERGY_INPUT_BLOCK = registerBlock("reprocessor_energy_input_block", () -> new ReprocessorEnergyInputBlock(BlockBehaviour.Properties.of()));
 
     public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_controller_block_entity",
             () -> BlockEntityType.Builder.of(ReprocessorControllerBlockEntity::new, REPROCESSOR_CONTROLLER_BLOCK.get()).build(null)
+    );
+    public static final Supplier<BlockEntityType<ReprocessorEnergyInputBlockEntity>> REPROCESSOR_ENERGY_INPUT_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "reprocessor_energy_input_block_entity",
+            () -> BlockEntityType.Builder.of(ReprocessorEnergyInputBlockEntity::new, REPROCESSOR_ENERGY_INPUT_BLOCK.get()).build(null)
+    );
+    public static final Supplier<BlockEntityType<ReprocessorInputBlockEntity>> REPROCESSOR_INPUT_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "reprocessor_input_block_entity",
+            () -> BlockEntityType.Builder.of(ReprocessorInputBlockEntity::new, REPROCESSOR_INPUT_BLOCK.get()).build(null)
+    );
+    public static final Supplier<BlockEntityType<ReprocessorOutputBlockEntity>> REPROCESSOR_OUTPUT_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "reprocessor_output_block_entity",
+            () -> BlockEntityType.Builder.of(ReprocessorOutputBlockEntity::new, REPROCESSOR_OUTPUT_BLOCK.get()).build(null)
     );
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
@@ -96,6 +130,9 @@ public class lushathings {
             .displayItems((parameters, output) -> {
                 output.accept(REPROCESSOR_CONTROLLER_BLOCK.get());
                 output.accept(REPROCESSOR_STRUCTURE_BLOCK.get());
+                output.accept(REPROCESSOR_INPUT_BLOCK.get());
+                output.accept(REPROCESSOR_OUTPUT_BLOCK.get());
+                output.accept(REPROCESSOR_ENERGY_INPUT_BLOCK.get());
             }).build());
 
     public lushathings(IEventBus modEventBus, ModContainer modContainer) {

@@ -9,6 +9,9 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import xyz.l7ssha.lushathings.screen.ReprocessorControllerScreen;
+import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputScreen;
+import xyz.l7ssha.lushathings.screen.ReprocessorHatchScreen;
 
 @Mod(value = lushathings.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = lushathings.MODID, value = Dist.CLIENT)
@@ -20,6 +23,9 @@ public class lushathingsClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
 //        event.register(lushathings.REPROCESSOR_MENU.get(), ReprocessorScreen::new);
+        event.register(lushathings.REPROCESSOR_HATCH_MENU.get(), ReprocessorHatchScreen::new);
+        event.register(lushathings.REPROCESSOR_CONTROLLER_MENU.get(), ReprocessorControllerScreen::new);
+        event.register(lushathings.REPROCESSOR_ENERGY_INPUT_MENU.get(), ReprocessorEnergyInputScreen::new);
     }
 
     @SubscribeEvent
