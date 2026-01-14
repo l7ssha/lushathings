@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "N": {
+      "item": "minecraft:nether_bricks"
+    },
+    "S": {
+      "item": "lushathings:reprocessor_structure_block"
+    }
+  },
+  "pattern": [
+    " N ",
+    " S ",
+    "HHH"
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:reprocessor_output_block"
+  }
+}

@@ -7,6 +7,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +33,9 @@ public class ReprocessorControllerMenu extends AbstractContainerMenu {
         this.data = data;
 
         this.addDataSlots(this.data);
+
+        addPlayerInventory(playerInventory);
+        addPlayerHotbar(playerInventory);
     }
 
     public boolean isProcessing() {
@@ -58,7 +62,45 @@ public class ReprocessorControllerMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        // No item slots in this menu.
-        return ItemStack.EMPTY;
+        Slot sourceSlot = this.slots.get(index);
+        if (!sourceSlot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack sourceStack = sourceSlot.getItem();
+        ItemStack copy = sourceStack.copy();
+
+        if (index < 27) {
+            if (!this.moveItemStackTo(sourceStack, 27, 36, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            if (!this.moveItemStackTo(sourceStack, 0, 27, false)) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (sourceStack.isEmpty()) {
+            sourceSlot.set(ItemStack.EMPTY);
+        } else {
+            sourceSlot.setChanged();
+        }
+
+        sourceSlot.onTake(player, sourceStack);
+        return copy;
+    }
+
+    private void addPlayerInventory(Inventory playerInventory) {
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                this.addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+            }
+        }
+    }
+
+    private void addPlayerHotbar(Inventory playerInventory) {
+        for (int i = 0; i < 9; ++i) {
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+        }
     }
 }

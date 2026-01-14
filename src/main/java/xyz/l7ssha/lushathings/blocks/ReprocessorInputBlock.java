@@ -8,6 +8,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
 
 public class ReprocessorInputBlock extends BaseEntityBlock implements ReprocessorMultiblock {
@@ -44,6 +47,15 @@ public class ReprocessorInputBlock extends BaseEntityBlock implements Reprocesso
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReprocessorInputBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        if (level.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(blockEntityType, lushathings.REPROCESSOR_INPUT_BLOCK_ENTITY.get(), ReprocessorInputBlockEntity::tick);
     }
     
     @Override

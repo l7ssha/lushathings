@@ -1,0 +1,38 @@
+{
+  "itemGroup.lushathings": "LushaThings",
+  
+  "block.lushathings.reprocessor_controller_block": "Sterownik Przetwornika",
+  "block.lushathings.reprocessor_structure_block": "Blok Strukturalny Przetwornika",
+  "block.lushathings.reprocessor_input_block": "Właz Wejściowy Przetwornika",
+  "block.lushathings.reprocessor_output_block": "Właz Wyjściowy Przetwornika",
+  "block.lushathings.reprocessor_energy_input_block": "Wejście Energii Przetwornika",
+  
+  "menu.lushathings.reprocessor_hatch": "Właz Przetwornika",
+  "menu.lushathings.reprocessor_energy_input": "Wejście Energii Przetwornika",
+
+  "lushathings.screen.reprocessor.recipe": "Receptura: %s",
+  "lushathings.screen.reprocessor.progress": "Postęp: %s/%s",
+  "lushathings.screen.reprocessor.status": "Status: %s",
+  "lushathings.screen.reprocessor.status.ok": "OK",
+  "lushathings.screen.reprocessor.status.no_input": "Brak włazu wejściowego",
+  "lushathings.screen.reprocessor.status.no_output": "Brak włazu wyjściowego",
+  "lushathings.screen.reprocessor.status.no_recipe": "Brak pasującej receptury",
+  "lushathings.screen.reprocessor.status.no_energy": "Za mało energii",
+  "lushathings.screen.reprocessor.status.output_full": "Wyjście pełne",
+  "lushathings.screen.reprocessor.status.unknown": "Nieznany",
+  "lushathings.screen.reprocessor.recipe.none": "Brak",
+
+  "lushathings.screen.hatch.auto_btn": "%s: %s",
+  "lushathings.screen.hatch.pull": "Pobieranie",
+  "lushathings.screen.hatch.push": "Wypychanie",
+  "lushathings.screen.hatch.on": "WŁ",
+  "lushathings.screen.hatch.off": "WYŁ",
+
+  "lushathings.configuration.title": "Konfiguracja Lusha Things",
+  "lushathings.configuration.section.lushathings.common.toml": "Konfiguracja Lusha Things",
+  "lushathings.configuration.section.lushathings.common.toml.title": "Konfiguracja Lusha Things",
+  "lushathings.configuration.items": "Lista Przedmiotów",
+  "lushathings.configuration.logDirtBlock": "Loguj Blok Ziemi",
+  "lushathings.configuration.magicNumberIntroduction": "Tekst Magicznej Liczby",
+  "lushathings.configuration.magicNumber": "Magiczna Liczba"
+}

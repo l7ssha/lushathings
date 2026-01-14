@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "I": {
+      "item": "lushathings:reprocessor_input_block"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    "RRR",
+    "DID",
+    "RRR"
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:reprocessor_energy_input_block"
+  }
+}

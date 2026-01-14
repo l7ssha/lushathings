@@ -2,23 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "F": {
-      "item": "minecraft:furnace"
-    },
-    "I": {
-      "item": "minecraft:netherite_ingot"
+    "H": {
+      "item": "minecraft:hopper"
     },
     "N": {
       "item": "minecraft:nether_bricks"
+    },
+    "S": {
+      "item": "lushathings:reprocessor_structure_block"
     }
   },
   "pattern": [
-    "NNN",
-    "IFI",
-    "IFI"
+    "HHH",
+    " S ",
+    " N "
   ],
   "result": {
     "count": 1,
-    "id": "lushathings:reprocessor_controller_block"
+    "id": "lushathings:reprocessor_input_block"
   }
 }

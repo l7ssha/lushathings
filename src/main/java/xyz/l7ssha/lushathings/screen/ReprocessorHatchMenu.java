@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,12 +16,10 @@ import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
 import xyz.l7ssha.lushathings.lushathings;
 
-/**
- * 9-slot hatch menu (3x3) for both input and output hatches.
- */
 public class ReprocessorHatchMenu extends AbstractContainerMenu {
     public final BlockEntity blockEntity;
     private final IItemHandler hatchInventory;
+    private final DataSlot autoIOState;
 
     public ReprocessorHatchMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
         this(containerId, playerInventory, playerInventory.player.level().getBlockEntity(buf.readBlockPos()));
@@ -41,13 +40,47 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
             default -> throw new IllegalStateException("Invalid block entity for hatch menu: " + blockEntity.getClass().getName());
         };
 
+        this.autoIOState = new DataSlot() {
+            @Override
+            public int get() {
+                if (blockEntity instanceof ReprocessorInputBlockEntity in) return in.autoPull ? 1 : 0;
+                if (blockEntity instanceof ReprocessorOutputBlockEntity out) return out.autoPush ? 1 : 0;
+                return 0;
+            }
+
+            @Override
+            public void set(int value) {
+                if (blockEntity instanceof ReprocessorInputBlockEntity in) in.autoPull = value != 0;
+                if (blockEntity instanceof ReprocessorOutputBlockEntity out) out.autoPush = value != 0;
+            }
+        };
+        this.addDataSlot(this.autoIOState);
+
         addHatchSlots();
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
     }
 
+    public boolean isAutoIOEnabled() {
+        return this.autoIOState.get() != 0;
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id == 0) {
+            if (blockEntity instanceof ReprocessorInputBlockEntity in) {
+                in.autoPull = !in.autoPull;
+                in.setChanged();
+            } else if (blockEntity instanceof ReprocessorOutputBlockEntity out) {
+                out.autoPush = !out.autoPush;
+                out.setChanged();
+            }
+            return true;
+        }
+        return false;
+    }
+
     private void addHatchSlots() {
-        // 3x3 at standard chest-ish positions
         int startX = 62;
         int startY = 17;
         int slot = 0;
@@ -83,7 +116,6 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        // Accept either hatch block
         return stillValid(ContainerLevelAccess.create(player.level(), blockEntity.getBlockPos()), player, player.level().getBlockState(blockEntity.getBlockPos()).getBlock());
     }
 
@@ -104,12 +136,10 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
         final int hotbarEnd = hotbarStart + 9;
 
         if (index < hatchSlots) {
-            // hatch -> player
             if (!this.moveItemStackTo(sourceStack, playerInvStart, hotbarEnd, true)) {
                 return ItemStack.EMPTY;
             }
         } else {
-            // player -> hatch
             if (this.blockEntity instanceof ReprocessorOutputBlockEntity) {
                 return ItemStack.EMPTY;
             }

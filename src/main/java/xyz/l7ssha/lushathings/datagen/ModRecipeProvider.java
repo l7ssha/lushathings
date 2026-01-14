@@ -25,14 +25,52 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_CONTROLLER_BLOCK.get())
-                .pattern("GGG")
-                .pattern("F F")
-                .pattern("NCN")
-                .define('G', Items.GLASS)
-                .define('F', Items.BLAST_FURNACE)
-                .define('N', Items.NETHERITE_BLOCK)
-                .define('C', Items.COBBLESTONE_SLAB)
+                .pattern("NNN")
+                .pattern("IFI")
+                .pattern("IFI")
+                .define('N', Items.NETHER_BRICKS)
+                .define('F', Items.FURNACE)
+                .define('I', Items.NETHERITE_INGOT)
                 .unlockedBy("has_netherite_ingot", has(Items.NETHERITE_INGOT))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_STRUCTURE_BLOCK.get())
+                .pattern("NNN")
+                .pattern("INI")
+                .pattern("NNN")
+                .define('N', Items.NETHER_BRICKS)
+                .define('I', Items.NETHERITE_INGOT)
+                .unlockedBy("has_netherite_ingot", has(Items.NETHERITE_INGOT))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_INPUT_BLOCK.get())
+                .pattern("HHH")
+                .pattern(" S ")
+                .pattern(" N ")
+                .define('H', Items.HOPPER)
+                .define('S', lushathings.REPROCESSOR_STRUCTURE_BLOCK.get())
+                .define('N', Items.NETHER_BRICKS)
+                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
+                .pattern(" N ")
+                .pattern(" S ")
+                .pattern("HHH")
+                .define('H', Items.HOPPER)
+                .define('S', lushathings.REPROCESSOR_STRUCTURE_BLOCK.get())
+                .define('N', Items.NETHER_BRICKS)
+                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK.get())
+                .pattern("RRR")
+                .pattern("DID")
+                .pattern("RRR")
+                .define('R', Items.REDSTONE_BLOCK)
+                .define('D', Items.DIAMOND)
+                .define('I', lushathings.REPROCESSOR_INPUT_BLOCK.get())
+                .unlockedBy("has_reprocessor_input", has(lushathings.REPROCESSOR_INPUT_BLOCK.get()))
                 .save(output);
 
         new ReprocessorRecipeBuilder(new ItemStack(Items.ANCIENT_DEBRIS), new ItemStack(Items.GOLD_INGOT), 600, 50000)

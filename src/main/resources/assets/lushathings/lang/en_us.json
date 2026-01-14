@@ -1,12 +1,32 @@
 {
   "itemGroup.lushathings": "LushaThings",
-  "block.lushathings.reprocessor_block": "Reprocessor",
-
+  
+  "block.lushathings.reprocessor_controller_block": "Reprocessor Controller",
+  "block.lushathings.reprocessor_structure_block": "Reprocessor Structure Block",
   "block.lushathings.reprocessor_input_block": "Reprocessor Input Hatch",
   "block.lushathings.reprocessor_output_block": "Reprocessor Output Hatch",
   "block.lushathings.reprocessor_energy_input_block": "Reprocessor Energy Input",
+  
   "menu.lushathings.reprocessor_hatch": "Reprocessor Hatch",
   "menu.lushathings.reprocessor_energy_input": "Reprocessor Energy Input",
+
+  "lushathings.screen.reprocessor.recipe": "Recipe: %s",
+  "lushathings.screen.reprocessor.progress": "Progress: %s/%s",
+  "lushathings.screen.reprocessor.status": "Status: %s",
+  "lushathings.screen.reprocessor.status.ok": "OK",
+  "lushathings.screen.reprocessor.status.no_input": "No input hatch",
+  "lushathings.screen.reprocessor.status.no_output": "No output hatch",
+  "lushathings.screen.reprocessor.status.no_recipe": "No matching recipe",
+  "lushathings.screen.reprocessor.status.no_energy": "Not enough energy",
+  "lushathings.screen.reprocessor.status.output_full": "Output full",
+  "lushathings.screen.reprocessor.status.unknown": "Unknown",
+  "lushathings.screen.reprocessor.recipe.none": "None",
+
+  "lushathings.screen.hatch.auto_btn": "%s: %s",
+  "lushathings.screen.hatch.pull": "Pull",
+  "lushathings.screen.hatch.push": "Push",
+  "lushathings.screen.hatch.on": "ON",
+  "lushathings.screen.hatch.off": "OFF",
 
   "lushathings.configuration.title": "lusha things Configs",
   "lushathings.configuration.section.lushathings.common.toml": "lusha things Configs",

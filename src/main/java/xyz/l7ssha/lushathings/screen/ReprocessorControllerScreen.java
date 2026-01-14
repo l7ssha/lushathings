@@ -24,6 +24,13 @@ public class ReprocessorControllerScreen extends AbstractContainerScreen<Reproce
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -37,29 +44,37 @@ public class ReprocessorControllerScreen extends AbstractContainerScreen<Reproce
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        // 2 lines of text: current recipe + progress
+        String recipeId = menu.blockEntity.getCurrentRecipeId();
+        Component recipeComp;
+        if ("None".equals(recipeId)) {
+            recipeComp = Component.translatable("lushathings.screen.reprocessor.recipe.none");
+        } else {
+            recipeComp = Component.literal(recipeId);
+        }
+
         guiGraphics.drawString(this.font,
-                Component.literal("Recipe: " + menu.blockEntity.getCurrentRecipeId()),
+                Component.translatable("lushathings.screen.reprocessor.recipe", recipeComp),
                 8, 20, 0x404040, false);
         guiGraphics.drawString(this.font,
-                Component.literal("Progress: " + menu.getProgress() + "/" + menu.getMaxProgress()),
+                Component.translatable("lushathings.screen.reprocessor.progress", menu.getProgress(), menu.getMaxProgress()),
                 8, 32, 0x404040, false);
 
         guiGraphics.drawString(this.font,
-                Component.literal("Status: " + statusText(menu.getStatus())),
+                Component.translatable("lushathings.screen.reprocessor.status", statusText(menu.getStatus())),
                 8, 44, 0x404040, false);
 
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
     }
 
-    private static String statusText(int status) {
+    private static Component statusText(int status) {
         return switch (status) {
-            case ReprocessorControllerBlockEntity.STATUS_OK -> "OK";
-            case ReprocessorControllerBlockEntity.STATUS_NO_INPUT_HATCH -> "No input hatch";
-            case ReprocessorControllerBlockEntity.STATUS_NO_OUTPUT_HATCH -> "No output hatch";
-            case ReprocessorControllerBlockEntity.STATUS_NO_RECIPE -> "No matching recipe";
-            case ReprocessorControllerBlockEntity.STATUS_NO_ENERGY -> "Not enough energy";
-            case ReprocessorControllerBlockEntity.STATUS_OUTPUT_FULL -> "Output full";
-            default -> "Unknown";
+            case ReprocessorControllerBlockEntity.STATUS_OK -> Component.translatable("lushathings.screen.reprocessor.status.ok");
+            case ReprocessorControllerBlockEntity.STATUS_NO_INPUT_HATCH -> Component.translatable("lushathings.screen.reprocessor.status.no_input");
+            case ReprocessorControllerBlockEntity.STATUS_NO_OUTPUT_HATCH -> Component.translatable("lushathings.screen.reprocessor.status.no_output");
+            case ReprocessorControllerBlockEntity.STATUS_NO_RECIPE -> Component.translatable("lushathings.screen.reprocessor.status.no_recipe");
+            case ReprocessorControllerBlockEntity.STATUS_NO_ENERGY -> Component.translatable("lushathings.screen.reprocessor.status.no_energy");
+            case ReprocessorControllerBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("lushathings.screen.reprocessor.status.output_full");
+            default -> Component.translatable("lushathings.screen.reprocessor.status.unknown");
         };
     }
 }

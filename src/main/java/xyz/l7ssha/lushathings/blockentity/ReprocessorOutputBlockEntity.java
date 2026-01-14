@@ -12,14 +12,20 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 
 public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuProvider {
+    public boolean autoPush = false;
+
     public final ItemStackHandler itemHandler = new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -55,6 +61,7 @@ public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuPro
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("inventory", itemHandler.serializeNBT(registries));
+        tag.putBoolean("autoPush", autoPush);
     }
 
     @Override
@@ -62,6 +69,34 @@ public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuPro
         super.loadAdditional(tag, registries);
         if (tag.contains("inventory")) {
             itemHandler.deserializeNBT(registries, tag.getCompound("inventory"));
+        }
+        if (tag.contains("autoPush")) {
+            autoPush = tag.getBoolean("autoPush");
+        }
+    }
+
+    public static void tick(Level level, BlockPos pos, BlockState state, ReprocessorOutputBlockEntity be) {
+        if (level.isClientSide || !be.autoPush || level.getGameTime() % 20 != 0) {
+            return;
+        }
+
+        for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
+            BlockPos neighborPos = pos.relative(dir);
+            IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+            if (neighbor != null) {
+                for (int slot = 0; slot < be.itemHandler.getSlots(); slot++) {
+                    ItemStack stack = be.itemHandler.extractItem(slot, 64, true);
+                    if (!stack.isEmpty()) {
+                        ItemStack remaining = ItemHandlerHelper.insertItemStacked(neighbor, stack, true);
+                        int toMove = stack.getCount() - remaining.getCount();
+
+                        if (toMove > 0) {
+                            ItemStack extracted = be.itemHandler.extractItem(slot, toMove, false);
+                            ItemHandlerHelper.insertItemStacked(neighbor, extracted, false);
+                        }
+                    }
+                }
+            }
         }
     }
 
