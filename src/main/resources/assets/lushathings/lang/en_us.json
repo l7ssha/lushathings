@@ -12,8 +12,9 @@
 
   "lushathings.screen.reprocessor.recipe": "Recipe: %s",
   "lushathings.screen.reprocessor.progress": "Progress: %s/%s",
+  "lushathings.screen.reprocessor.energy_usage": "Energy Usage: %s FE/t",
   "lushathings.screen.reprocessor.status": "Status: %s",
-  "lushathings.screen.reprocessor.status.ok": "OK",
+  "lushathings.screen.reprocessor.status.ok": "Running",
   "lushathings.screen.reprocessor.status.no_input": "No input hatch",
   "lushathings.screen.reprocessor.status.no_output": "No output hatch",
   "lushathings.screen.reprocessor.status.no_recipe": "No matching recipe",

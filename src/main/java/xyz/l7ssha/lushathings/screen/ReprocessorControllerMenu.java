@@ -54,6 +54,9 @@ public class ReprocessorControllerMenu extends AbstractContainerMenu {
         return data.get(2);
     }
 
+    public int getEnergyUsage() {
+        return data.get(3);
+    }
 
     @Override
     public boolean stillValid(Player player) {

@@ -63,6 +63,10 @@ public class ReprocessorControllerScreen extends AbstractContainerScreen<Reproce
                 Component.translatable("lushathings.screen.reprocessor.status", statusText(menu.getStatus())),
                 8, 44, 0x404040, false);
 
+        guiGraphics.drawString(this.font,
+                Component.translatable("lushathings.screen.reprocessor.energy_usage", menu.getEnergyUsage()),
+                8, 56, 0x404040, false);
+
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
     }
 

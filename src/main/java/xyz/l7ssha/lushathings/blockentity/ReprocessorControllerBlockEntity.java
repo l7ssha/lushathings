@@ -111,6 +111,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                     case 0 -> ReprocessorControllerBlockEntity.this.progress;
                     case 1 -> ReprocessorControllerBlockEntity.this.maxProgress;
                     case 2 -> ReprocessorControllerBlockEntity.this.status;
+                    case 3 -> ReprocessorControllerBlockEntity.this.energyCostLastTick;
                     default -> 0;
                 };
             }
@@ -121,6 +122,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                     case 0 -> ReprocessorControllerBlockEntity.this.progress = value;
                     case 1 -> ReprocessorControllerBlockEntity.this.maxProgress = value;
                     case 2 -> ReprocessorControllerBlockEntity.this.status = value;
+                    case 3 -> ReprocessorControllerBlockEntity.this.energyCostLastTick = value;
                 }
             }
 
@@ -164,6 +166,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             this.status = STATUS_NO_INPUT_HATCH;
             this.progress = 0;
             this.currentRecipeId = null;
+            this.energyCostLastTick = 0;
             return;
         }
 
@@ -171,6 +174,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             this.status = STATUS_NO_OUTPUT_HATCH;
             this.progress = 0;
             this.currentRecipeId = null;
+            this.energyCostLastTick = 0;
             return;
         }
 
@@ -179,6 +183,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             this.status = STATUS_NO_RECIPE;
             this.progress = 0;
             this.currentRecipeId = null;
+            this.energyCostLastTick = 0;
             return;
         }
 
@@ -187,6 +192,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         int cannotCraftReason = getCannotCraftReason(currentRecipe.get().value());
         if (cannotCraftReason != STATUS_OK) {
             this.status = cannotCraftReason;
+            this.energyCostLastTick = 0;
             return;
         }
 
@@ -201,6 +207,10 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             // Not enough energy; halt progress.
             this.status = STATUS_NO_ENERGY;
             progress = Math.max(0, progress - 1);
+            // We keep energyCostLastTick as is (or reset?)
+            // If we failed to extract full amount, we might have extracted partial.
+            // But usually we treat this as 'tried to run but failed'.
+            // Leaving it as recipe cost shows what was attempted.
             return;
         }
 

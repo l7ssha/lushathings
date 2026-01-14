@@ -12,8 +12,9 @@
 
   "lushathings.screen.reprocessor.recipe": "Receptura: %s",
   "lushathings.screen.reprocessor.progress": "Postęp: %s/%s",
+  "lushathings.screen.reprocessor.energy_usage": "Zużycie energii: %s FE/t",
   "lushathings.screen.reprocessor.status": "Status: %s",
-  "lushathings.screen.reprocessor.status.ok": "OK",
+  "lushathings.screen.reprocessor.status.ok": "Pracuje",
   "lushathings.screen.reprocessor.status.no_input": "Brak włazu wejściowego",
   "lushathings.screen.reprocessor.status.no_output": "Brak włazu wyjściowego",
   "lushathings.screen.reprocessor.status.no_recipe": "Brak pasującej receptury",
