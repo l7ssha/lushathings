@@ -73,9 +73,6 @@ public class lushathings {
                 }
             });
 
-//    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorMenu>> REPROCESSOR_MENU =
-//            registerMenuType("reprocessor_menu", ReprocessorMenu::new);
-
     public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorHatchMenu>> REPROCESSOR_HATCH_MENU =
             registerMenuType("reprocessor_hatch_menu", ReprocessorHatchMenu::new);
 
