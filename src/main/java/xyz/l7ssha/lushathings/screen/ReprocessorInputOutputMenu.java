@@ -8,49 +8,46 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.Nullable;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorInputOutputBlockEntity;
 import xyz.l7ssha.lushathings.lushathings;
 
-public class ReprocessorHatchMenu extends AbstractContainerMenu {
-    public final BlockEntity blockEntity;
-    private final IItemHandler hatchInventory;
+public class ReprocessorInputOutputMenu extends AbstractContainerMenu {
+    public final ReprocessorInputOutputBlockEntity blockEntity;
+    private final IItemHandler inputHandler;
+    private final IItemHandler outputHandler;
     private final DataSlot autoIOState;
 
-    public ReprocessorHatchMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
-        this(containerId, playerInventory, playerInventory.player.level().getBlockEntity(buf.readBlockPos()));
+    public ReprocessorInputOutputMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
+        this(containerId, playerInventory, (ReprocessorInputOutputBlockEntity) playerInventory.player.level().getBlockEntity(buf.readBlockPos()));
     }
 
-    public ReprocessorHatchMenu(int containerId, Inventory playerInventory, @Nullable BlockEntity blockEntity) {
-        super(lushathings.REPROCESSOR_HATCH_MENU.get(), containerId);
+    public ReprocessorInputOutputMenu(int containerId, Inventory playerInventory, @Nullable ReprocessorInputOutputBlockEntity blockEntity) {
+        super(lushathings.REPROCESSOR_INPUT_OUTPUT_MENU.get(), containerId);
 
         if (blockEntity == null) {
             throw new IllegalStateException("Missing block entity for hatch menu");
         }
 
         this.blockEntity = blockEntity;
-        this.hatchInventory = switch (blockEntity) {
-            case ReprocessorInputBlockEntity be -> be.getItemHandler();
-            case ReprocessorOutputBlockEntity be -> be.getItemHandler();
-            default -> throw new IllegalStateException("Invalid block entity for hatch menu: " + blockEntity.getClass().getName());
-        };
+        this.inputHandler = blockEntity.inputHandler;
+        this.outputHandler = blockEntity.outputHandler;
 
         this.autoIOState = new DataSlot() {
             @Override
             public int get() {
-                if (blockEntity instanceof ReprocessorInputBlockEntity in) return in.autoPull ? 1 : 0;
-                if (blockEntity instanceof ReprocessorOutputBlockEntity out) return out.autoPush ? 1 : 0;
-                return 0;
+                int val = 0;
+                if (blockEntity.autoPull) val |= 1;
+                if (blockEntity.autoPush) val |= 2;
+                return val;
             }
 
             @Override
             public void set(int value) {
-                if (blockEntity instanceof ReprocessorInputBlockEntity in) in.autoPull = value != 0;
-                if (blockEntity instanceof ReprocessorOutputBlockEntity out) out.autoPush = value != 0;
+                blockEntity.autoPull = (value & 1) != 0;
+                blockEntity.autoPush = (value & 2) != 0;
             }
         };
         this.addDataSlot(this.autoIOState);
@@ -60,36 +57,44 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
         addPlayerHotbar(playerInventory);
     }
 
-    public boolean isAutoIOEnabled() {
-        return this.autoIOState.get() != 0;
+    public boolean isAutoPullEnabled() {
+        return (this.autoIOState.get() & 1) != 0;
+    }
+
+    public boolean isAutoPushEnabled() {
+        return (this.autoIOState.get() & 2) != 0;
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == 0) {
-            if (blockEntity instanceof ReprocessorInputBlockEntity in) {
-                in.autoPull = !in.autoPull;
-                in.setChanged();
-            } else if (blockEntity instanceof ReprocessorOutputBlockEntity out) {
-                out.autoPush = !out.autoPush;
-                out.setChanged();
-            }
+        if (id == 0) { // Toggle Pull
+            blockEntity.autoPull = !blockEntity.autoPull;
+            blockEntity.setChanged();
+            return true;
+        } else if (id == 1) { // Toggle Push
+            blockEntity.autoPush = !blockEntity.autoPush;
+            blockEntity.setChanged();
             return true;
         }
         return false;
     }
 
     private void addHatchSlots() {
-        int startX = 62;
-        int startY = 17;
+        // Input (Left) - aligned to left edge of gui
+        addGrid(inputHandler, 8, 17, true);
+        // Output (Right) - aligned to right edge of gui
+        addGrid(outputHandler, 116, 17, false);
+    }
+
+    private void addGrid(IItemHandler handler, int startX, int startY, boolean allowInsert) {
         int slot = 0;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 final int slotIndex = slot++;
-                this.addSlot(new SlotItemHandler(this.hatchInventory, slotIndex, startX + col * 18, startY + row * 18) {
+                this.addSlot(new SlotItemHandler(handler, slotIndex, startX + col * 18, startY + row * 18) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        if (blockEntity instanceof ReprocessorOutputBlockEntity) {
+                        if (!allowInsert) {
                             return false;
                         }
                         return super.mayPlace(stack);
@@ -128,21 +133,19 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copy = sourceStack.copy();
 
-        final int hatchSlots = 9;
-        final int playerInvStart = hatchSlots;
-        final int playerInvEnd = playerInvStart + 27;
-        final int hotbarStart = playerInvEnd;
-        final int hotbarEnd = hotbarStart + 9;
+        final int inputSlotsStart = 0;
+        final int inputSlotsEnd = 9;
+        final int outputSlotsStart = 9;
+        final int outputSlotsEnd = 18;
+        final int playerInvStart = 18;
+        final int hotbarEnd = playerInvStart + 36;
 
-        if (index < hatchSlots) {
+        if (index < outputSlotsEnd) { // From hatch (either input or output handler)
             if (!this.moveItemStackTo(sourceStack, playerInvStart, hotbarEnd, true)) {
                 return ItemStack.EMPTY;
             }
-        } else {
-            if (this.blockEntity instanceof ReprocessorOutputBlockEntity) {
-                return ItemStack.EMPTY;
-            }
-            if (!this.moveItemStackTo(sourceStack, 0, hatchSlots, false)) {
+        } else { // From player
+            if (!this.moveItemStackTo(sourceStack, inputSlotsStart, inputSlotsEnd, false)) {
                 return ItemStack.EMPTY;
             }
         }

@@ -20,8 +20,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
-import xyz.l7ssha.lushathings.blocks.ReprocessorInputBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorOutputBlock;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorIOHatch;
 import xyz.l7ssha.lushathings.blocks.ReprocessorEnergyInputBlock;
 
 import java.util.ArrayList;
@@ -143,10 +142,14 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
                 multiblock.manipulateMutliblock(level, newState, target.immutable(), formed);
 
                 if (formed && controllerBE != null) {
-                    if (state.getBlock() instanceof ReprocessorInputBlock) {
-                        inputHatches.add(target.immutable());
-                    } else if (state.getBlock() instanceof ReprocessorOutputBlock) {
-                        outputHatches.add(target.immutable());
+                    BlockEntity be = level.getBlockEntity(target);
+                    if (be instanceof ReprocessorIOHatch hatch) {
+                        if (hatch.getInputInventory() != null) {
+                            inputHatches.add(target.immutable());
+                        }
+                        if (hatch.getOutputInventory() != null) {
+                            outputHatches.add(target.immutable());
+                        }
                     } else if (state.getBlock() instanceof ReprocessorEnergyInputBlock) {
                         energyInputs.add(target.immutable());
                     }

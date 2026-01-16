@@ -5,6 +5,7 @@
   "block.lushathings.reprocessor_structure_block": "Reprocessor Structure Block",
   "block.lushathings.reprocessor_input_block": "Reprocessor Input Hatch",
   "block.lushathings.reprocessor_output_block": "Reprocessor Output Hatch",
+  "block.lushathings.reprocessor_input_output_block": "Reprocessor Input/Output Hatch",
   "block.lushathings.reprocessor_energy_input_block": "Reprocessor Energy Input",
   
   "menu.lushathings.reprocessor_hatch": "Reprocessor Hatch",

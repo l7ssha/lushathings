@@ -72,4 +72,3 @@ public class ReprocessorHatchScreen extends AbstractContainerScreen<ReprocessorH
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
     }
 }
-

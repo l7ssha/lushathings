@@ -45,6 +45,7 @@ public class LushaJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_INPUT_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_OUTPUT_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new ItemStack(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()), ReprocessorRecipeCategory.RECIPE_TYPE);
     }

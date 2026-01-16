@@ -26,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorIOHatch;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -228,8 +231,9 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
     private boolean hasIngredients(ReprocessorRecipe recipe) {
         for (BlockPos inputPos : inputHatches) {
-            if (level.getBlockEntity(inputPos) instanceof ReprocessorInputBlockEntity inputBe) {
-                var handler = inputBe.getItemHandler();
+            if (level.getBlockEntity(inputPos) instanceof ReprocessorIOHatch hatch) {
+                var handler = hatch.getInputInventory();
+                if (handler == null) continue;
                 boolean allMatched = true;
 
                 for (SizedIngredient ingredient : recipe.inputs()) {
@@ -257,8 +261,9 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
     private void craftItem(ReprocessorRecipe recipe) {
         for (BlockPos inputPos : inputHatches) {
-            if (level.getBlockEntity(inputPos) instanceof ReprocessorInputBlockEntity inputBe) {
-                var handler = inputBe.getItemHandler();
+            if (level.getBlockEntity(inputPos) instanceof ReprocessorIOHatch hatch) {
+                var handler = hatch.getInputInventory();
+                if (handler == null) continue;
                 boolean possibleHere = true;
                  for (SizedIngredient ingredient : recipe.inputs()) {
                     int required = ingredient.count();
@@ -303,8 +308,9 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
     private void insertOutput(ItemStack stack) {
         for (BlockPos outputPos : outputHatches) {
-            if (level.getBlockEntity(outputPos) instanceof ReprocessorOutputBlockEntity outputBe) {
-                var handler = outputBe.getItemHandler();
+            if (level.getBlockEntity(outputPos) instanceof ReprocessorIOHatch hatch) {
+                var handler = hatch.getOutputInventory();
+                if (handler == null) continue;
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack slotStack = handler.getStackInSlot(i);
                     if (slotStack.isEmpty()) {
@@ -374,8 +380,9 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private boolean simulateInsert(ItemStack stack) {
          ItemStack remaining = stack.copy();
          for (BlockPos outputPos : outputHatches) {
-            if (level.getBlockEntity(outputPos) instanceof ReprocessorOutputBlockEntity outputBe) {
-                var handler = outputBe.getItemHandler();
+            if (level.getBlockEntity(outputPos) instanceof ReprocessorIOHatch hatch) {
+                var handler = hatch.getOutputInventory();
+                if (handler == null) continue;
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack slotStack = handler.getStackInSlot(i);
                     if (slotStack.isEmpty()) {

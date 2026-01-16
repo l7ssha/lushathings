@@ -24,7 +24,7 @@ import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 
-public class ReprocessorInputBlockEntity extends BlockEntity implements MenuProvider {
+public class ReprocessorInputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorIOHatch {
     public boolean autoPull = false;
 
     public final ItemStackHandler itemHandler = new ItemStackHandler(9) {
@@ -58,6 +58,16 @@ public class ReprocessorInputBlockEntity extends BlockEntity implements MenuProv
 
     public ItemStackHandler getItemHandler() {
         return itemHandler;
+    }
+
+    @Override
+    public @Nullable ItemStackHandler getInputInventory() {
+        return itemHandler;
+    }
+
+    @Override
+    public @Nullable ItemStackHandler getOutputInventory() {
+        return null;
     }
 
     @Override

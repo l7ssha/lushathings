@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 
-public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuProvider {
+public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorIOHatch {
     public boolean autoPush = false;
 
     public final ItemStackHandler itemHandler = new ItemStackHandler(9) {
@@ -44,6 +44,16 @@ public class ReprocessorOutputBlockEntity extends BlockEntity implements MenuPro
     }
 
     public ItemStackHandler getItemHandler() {
+        return itemHandler;
+    }
+
+    @Override
+    public @Nullable ItemStackHandler getInputInventory() {
+        return null;
+    }
+
+    @Override
+    public @Nullable ItemStackHandler getOutputInventory() {
         return itemHandler;
     }
 
