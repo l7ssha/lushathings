@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "lushathings:reprocessor_input_block"
+    },
+    {
+      "item": "lushathings:reprocessor_output_block"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:reprocessor_input_output_block"
+  }
+}

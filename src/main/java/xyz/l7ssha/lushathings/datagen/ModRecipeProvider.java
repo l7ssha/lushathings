@@ -6,6 +6,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -61,6 +62,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('S', lushathings.REPROCESSOR_STRUCTURE_BLOCK.get())
                 .define('N', Items.NETHER_BRICKS)
                 .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+                .save(output);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK.get())
+                .requires(lushathings.REPROCESSOR_INPUT_BLOCK.get())
+                .requires(lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
+                .requires(Items.DIAMOND)
+                .unlockedBy("has_reprocessor_input", has(lushathings.REPROCESSOR_INPUT_BLOCK.get()))
                 .save(output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK.get())
