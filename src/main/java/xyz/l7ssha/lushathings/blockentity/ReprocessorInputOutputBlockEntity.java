@@ -17,8 +17,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
@@ -61,7 +63,6 @@ public class ReprocessorInputOutputBlockEntity extends BlockEntity implements Me
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-             // Disallow manual insertion into output slots
             return false;
         }
     };
@@ -71,13 +72,17 @@ public class ReprocessorInputOutputBlockEntity extends BlockEntity implements Me
     }
 
     @Override
-    public @Nullable ItemStackHandler getInputInventory() {
-        return inputHandler;
+    public @Nullable IItemHandlerModifiable getInputInventory() {
+        return this.inputHandler;
     }
 
     @Override
-    public @Nullable ItemStackHandler getOutputInventory() {
-        return outputHandler;
+    public @Nullable IItemHandlerModifiable getOutputInventory() {
+        return this.outputHandler;
+    }
+
+    public @Nullable IItemHandlerModifiable getCombinedInventory() {
+        return new CombinedInvWrapper(this.inputHandler, this.outputHandler);
     }
 
     @Override

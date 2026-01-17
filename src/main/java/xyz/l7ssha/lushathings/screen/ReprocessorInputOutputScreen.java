@@ -33,7 +33,7 @@ public class ReprocessorInputOutputScreen extends AbstractContainerScreen<Reproc
                         this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 0);
                     }
                 })
-                .bounds(relX + 63, relY + 18, 50, 20)
+                .bounds(relX + 120, relY + 18, 50, 20)
                 .build());
 
         this.autoPushButton = this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
@@ -43,7 +43,7 @@ public class ReprocessorInputOutputScreen extends AbstractContainerScreen<Reproc
                         this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 1);
                     }
                 })
-                .bounds(relX + 63, relY + 40, 50, 20)
+                .bounds(relX + 120, relY + 40, 50, 20)
                 .build());
     }
 
@@ -88,11 +88,5 @@ public class ReprocessorInputOutputScreen extends AbstractContainerScreen<Reproc
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
-
-        // Draw slot backgrounds if needed.
-        // We reuse reprocessor_hatch_gui.png which has a 3x3 grid at 62, 17 (size 54x54)
-        // We want to draw it at 8, 17 and 116, 17.
-        guiGraphics.blit(TEXTURE, x + 8, y + 17, 62, 17, 54, 54);
-        guiGraphics.blit(TEXTURE, x + 116, y + 17, 62, 17, 54, 54);
     }
 }

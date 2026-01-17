@@ -101,7 +101,7 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
             if (level.getBlockEntity(pos) instanceof ReprocessorControllerBlockEntity be) {
                 player.openMenu(be, pos);
             }
-            return ItemInteractionResult.SUCCESS;
+            return ItemInteractionResult.CONSUME;
         }
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;

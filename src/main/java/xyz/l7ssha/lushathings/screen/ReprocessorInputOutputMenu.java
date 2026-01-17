@@ -80,10 +80,8 @@ public class ReprocessorInputOutputMenu extends AbstractContainerMenu {
     }
 
     private void addHatchSlots() {
-        // Input (Left) - aligned to left edge of gui
         addGrid(inputHandler, 8, 17, true);
-        // Output (Right) - aligned to right edge of gui
-        addGrid(outputHandler, 116, 17, false);
+        addGrid(outputHandler, 63, 17, false);
     }
 
     private void addGrid(IItemHandler handler, int startX, int startY, boolean allowInsert) {
