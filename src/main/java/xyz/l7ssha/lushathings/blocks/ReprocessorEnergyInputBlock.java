@@ -57,23 +57,6 @@ public class ReprocessorEnergyInputBlock extends BaseEntityBlock implements Repr
         }
     }
 
-    private void unformEntireMultiblock(Level level, BlockPos pos) {
-        // Find the controller for the current 3x3x3 structure and unform from its saved center.
-        for (BlockPos checkPos : BlockPos.betweenClosed(pos.offset(-2, -2, -2), pos.offset(2, 2, 2))) {
-            BlockState checkState = level.getBlockState(checkPos);
-            if (checkState.getBlock() instanceof ReprocessorControllerBlock controller
-                    && checkState.getValue(ReprocessorControllerBlock.MUTLIBLOCK_FORMED)
-                    && level.getBlockEntity(checkPos) instanceof ReprocessorControllerBlockEntity be) {
-                BlockPos center = be.getCenterPos();
-                if (center != null) {
-                    controller.formArea(level, center, false, be);
-                    be.setCenterPos(null);
-                }
-                break;
-            }
-        }
-    }
-
     @Override
     public void manipulateMutliblock(Level level, BlockState newState, BlockPos blockPos, boolean flag) {
         level.setBlockAndUpdate(blockPos, newState);

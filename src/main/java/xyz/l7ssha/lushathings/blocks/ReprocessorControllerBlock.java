@@ -116,6 +116,7 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
                     formArea(level, center, false, be);
                 }
             }
+
             super.onRemove(state, level, pos, newState, movedByPiston);
         }
     }

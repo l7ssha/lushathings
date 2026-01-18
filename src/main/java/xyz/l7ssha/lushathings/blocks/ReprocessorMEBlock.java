@@ -26,6 +26,16 @@ public class ReprocessorMEBlock extends BaseEntityBlock implements ReprocessorMu
     }
 
     @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (state.getValue(MUTLIBLOCK_FORMED)) {
+                unformEntireMultiblock(level, pos);
+            }
+            super.onRemove(state, level, pos, newState, movedByPiston);
+        }
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(MUTLIBLOCK_FORMED);
     }
@@ -39,10 +49,5 @@ public class ReprocessorMEBlock extends BaseEntityBlock implements ReprocessorMu
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReprocessorMEBlockEntity(pos, state);
-    }
-
-    @Override
-    public void manipulateMutliblock(Level level, BlockState newState, BlockPos blockPos, boolean flag) {
-        level.setBlockAndUpdate(blockPos, newState);
     }
 }

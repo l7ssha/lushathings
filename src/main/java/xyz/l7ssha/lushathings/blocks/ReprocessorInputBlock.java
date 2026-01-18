@@ -59,8 +59,13 @@ public class ReprocessorInputBlock extends BaseEntityBlock implements Reprocesso
     }
 
     @Override
-    public void manipulateMutliblock(Level level, BlockState newState, BlockPos blockPos, boolean flag) {
-        level.setBlockAndUpdate(blockPos, newState);
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (state.getValue(MUTLIBLOCK_FORMED)) {
+                unformEntireMultiblock(level, pos);
+            }
+            super.onRemove(state, level, pos, newState, movedByPiston);
+        }
     }
 
     @Override

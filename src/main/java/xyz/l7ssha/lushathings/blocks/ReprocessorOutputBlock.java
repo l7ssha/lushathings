@@ -49,6 +49,16 @@ public class ReprocessorOutputBlock extends BaseEntityBlock implements Reprocess
         return new ReprocessorOutputBlockEntity(pos, state);
     }
 
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (state.getValue(MUTLIBLOCK_FORMED)) {
+                unformEntireMultiblock(level, pos);
+            }
+            super.onRemove(state, level, pos, newState, movedByPiston);
+        }
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
@@ -56,11 +66,6 @@ public class ReprocessorOutputBlock extends BaseEntityBlock implements Reprocess
             return null;
         }
         return createTickerHelper(blockEntityType, lushathings.REPROCESSOR_OUTPUT_BLOCK_ENTITY.get(), ReprocessorOutputBlockEntity::tick);
-    }
-    
-    @Override
-    public void manipulateMutliblock(Level level, BlockState newState, BlockPos blockPos, boolean flag) {
-        level.setBlockAndUpdate(blockPos, newState);
     }
 
     @Override
