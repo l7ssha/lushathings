@@ -57,7 +57,7 @@ public class ReprocessorInputBlock extends BaseEntityBlock implements Reprocesso
         }
         return createTickerHelper(blockEntityType, lushathings.REPROCESSOR_INPUT_BLOCK_ENTITY.get(), ReprocessorInputBlockEntity::tick);
     }
-    
+
     @Override
     public void manipulateMutliblock(Level level, BlockState newState, BlockPos blockPos, boolean flag) {
         level.setBlockAndUpdate(blockPos, newState);

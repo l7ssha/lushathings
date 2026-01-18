@@ -1,5 +1,6 @@
 package xyz.l7ssha.lushathings;
 
+import appeng.api.AECapabilities;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -36,5 +37,11 @@ public class ModEventBus {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_OUTPUT_BLOCK_ENTITY.get(), (be, context) -> be.getItemHandler());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(), (be, context) -> be.getCombinedInventory());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK_ENTITY.get(), (be, context) -> be.getEnergyStorage());
+
+        event.registerBlockEntity(
+                AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                lushathings.REPROCESSOR_ME_BLOCK_ENTITY.get(),
+                (be, context) -> be
+        );
     }
 }

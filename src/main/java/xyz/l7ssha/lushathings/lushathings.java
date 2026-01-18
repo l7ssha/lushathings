@@ -32,17 +32,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorEnergyInputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorInputOutputBlockEntity;
-import xyz.l7ssha.lushathings.blocks.ReprocessorControllerBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorEnergyInputBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorInputBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorOutputBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorInputOutputBlock;
-import xyz.l7ssha.lushathings.blocks.ReprocessorStructureBlock;
+import xyz.l7ssha.lushathings.blockentity.*;
+import xyz.l7ssha.lushathings.blocks.*;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
@@ -94,6 +85,7 @@ public class lushathings {
     public static final DeferredBlock<Block> REPROCESSOR_OUTPUT_BLOCK = registerBlock("reprocessor_output_block", () -> new ReprocessorOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_INPUT_OUTPUT_BLOCK = registerBlock("reprocessor_input_output_block", () -> new ReprocessorInputOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_ENERGY_INPUT_BLOCK = registerBlock("reprocessor_energy_input_block", () -> new ReprocessorEnergyInputBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_ME_BLOCK = registerBlock("reprocessor_me_block", () -> new ReprocessorMEBlock(BlockBehaviour.Properties.of()));
 
     public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_controller_block_entity",
@@ -114,6 +106,10 @@ public class lushathings {
     public static final Supplier<BlockEntityType<ReprocessorInputOutputBlockEntity>> REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_input_output_block_entity",
             () -> BlockEntityType.Builder.of(ReprocessorInputOutputBlockEntity::new, REPROCESSOR_INPUT_OUTPUT_BLOCK.get()).build(null)
+    );
+    public static final Supplier<BlockEntityType<ReprocessorMEBlockEntity>> REPROCESSOR_ME_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "reprocessor_me_block_entity",
+            () -> BlockEntityType.Builder.of(ReprocessorMEBlockEntity::new, REPROCESSOR_ME_BLOCK.get()).build(null)
     );
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
@@ -142,6 +138,7 @@ public class lushathings {
                 output.accept(REPROCESSOR_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_INPUT_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_ENERGY_INPUT_BLOCK.get());
+                output.accept(REPROCESSOR_ME_BLOCK.get());
             }).build());
 
     public lushathings(IEventBus modEventBus, ModContainer modContainer) {

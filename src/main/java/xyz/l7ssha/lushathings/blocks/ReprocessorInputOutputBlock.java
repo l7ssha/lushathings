@@ -68,12 +68,14 @@ public class ReprocessorInputOutputBlock extends BaseEntityBlock implements Repr
         if (!state.getValue(MUTLIBLOCK_FORMED)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
+
         if (!level.isClientSide) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof ReprocessorInputOutputBlockEntity) {
                 player.openMenu((ReprocessorInputOutputBlockEntity) be, pos);
             }
         }
-        return ItemInteractionResult.SUCCESS;
+
+        return ItemInteractionResult.CONSUME;
     }
 }
