@@ -126,8 +126,7 @@ dependencies {
     // at runtime, use the full JEI jar for NeoForge
     runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
-    compileOnly("org.appliedenergistics:appliedenergistics2:${ae2_version}")
-//    compileOnly("org.appliedenergistics:appliedenergistics2:${ae2_version}:api")
+    compileOnly("org.appliedenergistics:appliedenergistics2:${ae2_version}:api")
     runtimeOnly("org.appliedenergistics:appliedenergistics2:${ae2_version}")
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

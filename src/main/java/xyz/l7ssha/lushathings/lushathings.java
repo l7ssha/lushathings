@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.IContainerFactory;
@@ -85,7 +86,7 @@ public class lushathings {
     public static final DeferredBlock<Block> REPROCESSOR_OUTPUT_BLOCK = registerBlock("reprocessor_output_block", () -> new ReprocessorOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_INPUT_OUTPUT_BLOCK = registerBlock("reprocessor_input_output_block", () -> new ReprocessorInputOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_ENERGY_INPUT_BLOCK = registerBlock("reprocessor_energy_input_block", () -> new ReprocessorEnergyInputBlock(BlockBehaviour.Properties.of()));
-    public static final DeferredBlock<Block> REPROCESSOR_ME_BLOCK = registerBlock("reprocessor_me_block", () -> new ReprocessorMEBlock(BlockBehaviour.Properties.of()));
+    public static DeferredBlock<Block> REPROCESSOR_ME_BLOCK;
 
     public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_controller_block_entity",
@@ -107,10 +108,18 @@ public class lushathings {
             "reprocessor_input_output_block_entity",
             () -> BlockEntityType.Builder.of(ReprocessorInputOutputBlockEntity::new, REPROCESSOR_INPUT_OUTPUT_BLOCK.get()).build(null)
     );
-    public static final Supplier<BlockEntityType<ReprocessorMEBlockEntity>> REPROCESSOR_ME_BLOCK_ENTITY = BLOCK_ENTITIES.register(
-            "reprocessor_me_block_entity",
-            () -> BlockEntityType.Builder.of(ReprocessorMEBlockEntity::new, REPROCESSOR_ME_BLOCK.get()).build(null)
-    );
+    public static Supplier<BlockEntityType<ReprocessorMEBlockEntity>> REPROCESSOR_ME_BLOCK_ENTITY;
+
+    static {
+        if (ModList.get().isLoaded("ae2")) {
+            REPROCESSOR_ME_BLOCK = registerBlock("reprocessor_me_block", () -> new ReprocessorMEBlock(BlockBehaviour.Properties.of()));
+
+            REPROCESSOR_ME_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+                    "reprocessor_me_block_entity",
+                    () -> BlockEntityType.Builder.of(ReprocessorMEBlockEntity::new, REPROCESSOR_ME_BLOCK.get()).build(null)
+            );
+        }
+    }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IMenuTypeExtension.create(factory));

@@ -5,13 +5,12 @@ import appeng.api.crafting.IPatternDetails;
 import appeng.api.networking.*;
 import appeng.api.networking.crafting.ICraftingProvider;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.util.AECableType;
-import appeng.block.IOwnerAwareBlockEntity;
-import appeng.me.helpers.MachineSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -33,7 +32,7 @@ import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 
 import java.util.*;
 
-public class ReprocessorMEBlockEntity extends BlockEntity implements ReprocessorIOHatch, IActionHost, IOwnerAwareBlockEntity, IInWorldGridNodeHost, IGridNodeListener<ReprocessorMEBlockEntity>, ICraftingProvider {
+public class ReprocessorMEBlockEntity extends BlockEntity implements ReprocessorIOHatch, IActionHost, IInWorldGridNodeHost, IGridNodeListener<ReprocessorMEBlockEntity>, ICraftingProvider {
     protected final IManagedGridNode gridNode;
 
     public final ItemStackHandler inputHandler = new ItemStackHandler(9) {
@@ -85,7 +84,7 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
 
         var inventory = gridNode.getStorageService().getInventory();
 
-        var actionSource = new MachineSource(blockEntity);
+        var actionSource = new ActionSource(blockEntity);
 
         for (int slot = 0; slot < blockEntity.outputHandler.getSlots(); slot++) {
             var stack = blockEntity.outputHandler.extractItem(slot, 64, true);
@@ -189,10 +188,6 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         super.setRemoved();
 
         this.gridNode.destroy();
-    }
-
-    @Override
-    public void setOwner(Player owner) {
     }
 
     @Override
@@ -303,6 +298,29 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         @Override
         public AEKey getRemainingKey(AEKey template) {
             return null;
+        }
+    }
+
+    private static class ActionSource implements IActionSource {
+        private final IActionHost actionHost;
+
+        private ActionSource(IActionHost blockEntity) {
+            this.actionHost = blockEntity;
+        }
+
+        @Override
+        public Optional<Player> player() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<IActionHost> machine() {
+            return Optional.of(actionHost);
+        }
+
+        @Override
+        public <T> Optional<T> context(Class<T> key) {
+            return Optional.empty();
         }
     }
 }
