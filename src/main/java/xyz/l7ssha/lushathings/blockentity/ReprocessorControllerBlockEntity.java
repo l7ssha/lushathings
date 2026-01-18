@@ -26,14 +26,12 @@ import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorIOHatch;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.ArrayList;
 import java.util.List;
+
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 
 // TODO: Menu implements MenuProvider
@@ -138,8 +136,14 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         return new ReprocessorControllerMenu(containerId, inventory, this, this.data);
     }
 
-    public void setCenterPos(BlockPos pos) { this.centerPos = pos; setChanged(); }
-    public BlockPos getCenterPos() { return this.centerPos; }
+    public void setCenterPos(BlockPos pos) {
+        this.centerPos = pos;
+        setChanged();
+    }
+
+    public BlockPos getCenterPos() {
+        return this.centerPos;
+    }
 
     public void setInputHatches(List<BlockPos> inputHatches) {
         this.inputHatches = inputHatches;
@@ -243,7 +247,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                     for (int i = 0; i < handler.getSlots(); i++) {
                         ItemStack stack = handler.getStackInSlot(i);
                         if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-                             foundCount += stack.getCount();
+                            foundCount += stack.getCount();
                         }
                     }
 
@@ -265,13 +269,13 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                 var handler = hatch.getInputInventory();
                 if (handler == null) continue;
                 boolean possibleHere = true;
-                 for (SizedIngredient ingredient : recipe.inputs()) {
+                for (SizedIngredient ingredient : recipe.inputs()) {
                     int required = ingredient.count();
                     int foundCount = 0;
                     for (int i = 0; i < handler.getSlots(); i++) {
                         ItemStack stack = handler.getStackInSlot(i);
                         if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-                             foundCount += stack.getCount();
+                            foundCount += stack.getCount();
                         }
                     }
                     if (foundCount < required) {
@@ -281,7 +285,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                 }
 
                 if (possibleHere) {
-                     for (SizedIngredient ingredient : recipe.inputs()) {
+                    for (SizedIngredient ingredient : recipe.inputs()) {
                         int required = ingredient.count();
                         for (int i = 0; i < handler.getSlots(); i++) {
                             ItemStack stack = handler.getStackInSlot(i);
@@ -378,8 +382,8 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     }
 
     private boolean simulateInsert(ItemStack stack) {
-         ItemStack remaining = stack.copy();
-         for (BlockPos outputPos : outputHatches) {
+        ItemStack remaining = stack.copy();
+        for (BlockPos outputPos : outputHatches) {
             if (level.getBlockEntity(outputPos) instanceof ReprocessorIOHatch hatch) {
                 var handler = hatch.getOutputInventory();
                 if (handler == null) continue;

@@ -43,8 +43,13 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+        return 171;
+    }
+
+    @Override
+    public int getHeight() {
+        return 75;
     }
 
     @Override

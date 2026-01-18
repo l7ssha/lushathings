@@ -7,10 +7,14 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorMEBlockEntity;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
+import xyz.l7ssha.lushathings.lushathings;
 
 public class ReprocessorMEBlock extends BaseEntityBlock implements ReprocessorMultiblock {
     public static final MapCodec<ReprocessorMEBlock> CODEC = simpleCodec(ReprocessorMEBlock::new);
@@ -49,5 +53,14 @@ public class ReprocessorMEBlock extends BaseEntityBlock implements ReprocessorMu
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReprocessorMEBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        if (level.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(blockEntityType, lushathings.REPROCESSOR_ME_BLOCK_ENTITY.get(), ReprocessorMEBlockEntity::tick);
     }
 }
