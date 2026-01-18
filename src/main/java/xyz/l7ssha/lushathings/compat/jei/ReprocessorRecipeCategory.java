@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
@@ -27,8 +28,8 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
     private final IDrawable icon;
 
     public ReprocessorRecipeCategory(IGuiHelper helper) {
-        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_controller_gui.png");
-        this.background = helper.createDrawable(texture, 5, 5, 171, 75);
+        this.background = helper.createDrawable(ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_gui.png"), 5, 5, 165, 75);
+
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get()));
     }
 
@@ -44,12 +45,12 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
 
     @Override
     public int getWidth() {
-        return 171;
+        return this.background.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return 75;
+        return this.background.getHeight();
     }
 
     @Override
@@ -59,8 +60,8 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ReprocessorRecipe recipe, IFocusGroup focuses) {
-        int x = 40;
-        int y = 20;
+        int x = 3;
+        int y = 12;
 
         // Inputs
         for (int i = 0; i < recipe.inputs().size(); i++) {
@@ -77,7 +78,7 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
         }
 
         // Outputs
-        int outX = 100;
+        int outX = 111;
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, outX, y)
                 .addItemStack(recipe.output());
@@ -89,13 +90,15 @@ public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRec
     }
 
     @Override
-    public void draw(ReprocessorRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(ReprocessorRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, @NotNull GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        this.background.draw(guiGraphics);
+
         // Draw Energy Cost
         Component energyText = Component.literal(recipe.energyCost() + " FE");
-        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, energyText, 10, 60, 0xFF0000, false);
+        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, energyText, 10, 70, 0xFF0000, false);
 
         // Draw Crafting Time
         Component timeText = Component.literal(recipe.craftingTime() + " ticks");
-        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, timeText, 100, 60, 0x404040, false);
+        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, timeText, 100, 70, 0x404040, false);
     }
 }
