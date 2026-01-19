@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "lushathings:block/eternal_fire_source_recombinator_aux",
+    "side": "lushathings:block/eternal_fire_source_recombinator_side_lit",
+    "top": "lushathings:block/eternal_fire_source_recombinator_aux"
+  }
+}

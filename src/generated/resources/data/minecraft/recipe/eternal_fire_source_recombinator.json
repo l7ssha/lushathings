@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "M": {
+      "item": "minecraft:nether_star"
+    },
+    "S": {
+      "item": "minecraft:soul_sand"
+    }
+  },
+  "pattern": [
+    "FSF",
+    "SMS",
+    "BSB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:eternal_fire_source_recombinator"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "lushathings:block/eternal_fire_source_recombinator"
+    },
+    "lit=true": {
+      "model": "lushathings:block/eternal_fire_source_recombinator_lit"
+    }
+  }
+}

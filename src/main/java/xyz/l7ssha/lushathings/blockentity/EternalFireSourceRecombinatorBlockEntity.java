@@ -13,11 +13,10 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.EnergyStorageWrapper;
 
-// TODO: https://github.com/62832/ArsEnergistique/blob/master/src/main/java/gripe/_90/arseng/block/entity/MESourceJarBlockEntity.java
 public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implements ISourceCap {
-    private static final int MAX_SOURCE_STORAGE = 4096;
-    private static final int MAX_FE_STORAGE = 1_000_000;
-    private static final int MAX_FE_CONSUME_PER_TICK = 512_000;
+    private static final int SOURCE_GENERATE_PER_TICK = 128;
+    private static final int MAX_FE_STORAGE = 500_000;
+    private static final int MAX_FE_CONSUME_PER_TICK = 256_000;
 
     private int storedSource = 0;
 
@@ -73,46 +72,52 @@ public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implem
             return;
         }
 
+        boolean isProcessing = false;
+        boolean hasSoulFire = false;
+        boolean hasSoulSand = false;
+
         if ((level.getGameTime() % 10L) == 0L) {
             BlockPos firePos = pos.below();
             BlockPos sandPos = firePos.below();
 
-            boolean hasSoulFire = level.getBlockState(firePos).is(Blocks.SOUL_FIRE);
-            boolean hasSoulSand = level.getBlockState(sandPos).is(Blocks.SOUL_SAND);
+            hasSoulFire = level.getBlockState(firePos).is(Blocks.SOUL_FIRE);
+            hasSoulSand = level.getBlockState(sandPos).is(Blocks.SOUL_SAND);
+        }
 
-            if (!hasSoulFire || !hasSoulSand) {
+        int remainingSourceSpace = SOURCE_GENERATE_PER_TICK - blockEntity.storedSource;
+        if (remainingSourceSpace > 0 && hasSoulFire && hasSoulSand) {
+            long feNeededForRemaining = (long) Math.ceil(MAX_FE_CONSUME_PER_TICK * Math.pow(remainingSourceSpace / (double) SOURCE_GENERATE_PER_TICK, 2));
+            int feToConsume = (int) Math.min(MAX_FE_CONSUME_PER_TICK, Math.min(Integer.MAX_VALUE, feNeededForRemaining));
+
+            if (feToConsume <= 0) {
                 return;
             }
-        }
 
-        int remainingSourceSpace = MAX_SOURCE_STORAGE - blockEntity.storedSource;
-        if (remainingSourceSpace <= 0) {
-            return;
-        }
+            int feConsumed = blockEntity.energyStorage.extractEnergy(feToConsume, false);
+            if (feConsumed <= 0) {
+                return;
+            }
 
-        long feNeededForRemaining = (long) Math.ceil(MAX_FE_CONSUME_PER_TICK * Math.pow(remainingSourceSpace / (double) MAX_SOURCE_STORAGE, 2));
-        int feToConsume = (int) Math.min(MAX_FE_CONSUME_PER_TICK, Math.min(Integer.MAX_VALUE, feNeededForRemaining));
-        if (feToConsume <= 0) {
-            return;
-        }
+            isProcessing = true;
+            int sourceGenerated = (int) Math.floor(SOURCE_GENERATE_PER_TICK * Math.sqrt(feConsumed / (double) MAX_FE_CONSUME_PER_TICK));
+            sourceGenerated = Math.min(sourceGenerated, remainingSourceSpace);
+            if (sourceGenerated > 0) {
+                blockEntity.storedSource += sourceGenerated;
+                blockEntity.setChanged(level, pos, state);
 
-        int feConsumed = blockEntity.energyStorage.extractEnergy(feToConsume, false);
-        if (feConsumed <= 0) {
-            return;
-        }
-
-        int sourceGenerated = (int) Math.floor(MAX_SOURCE_STORAGE * Math.sqrt(feConsumed / (double) MAX_FE_CONSUME_PER_TICK));
-        sourceGenerated = Math.min(sourceGenerated, remainingSourceSpace);
-        if (sourceGenerated > 0) {
-            blockEntity.storedSource += sourceGenerated;
-            blockEntity.setChanged(level, pos, state);
-
-            if (level.random.nextFloat() < 0.01F) {
-                BlockPos firePos = pos.below();
-                if (level.getBlockState(firePos).is(Blocks.SOUL_FIRE)) {
-                    level.setBlockAndUpdate(firePos, Blocks.AIR.defaultBlockState());
+                if (level.random.nextFloat() < 0.02F) {
+                    BlockPos firePos = pos.below();
+                    if (level.getBlockState(firePos).is(Blocks.SOUL_FIRE)) {
+                        level.setBlockAndUpdate(firePos, Blocks.AIR.defaultBlockState());
+                    }
                 }
             }
+        }
+
+        // Update LIT state
+        boolean currentlyLit = state.getValue(xyz.l7ssha.lushathings.blocks.EternalFireSourceRecombinatorBlock.LIT);
+        if (currentlyLit != isProcessing) {
+            level.setBlockAndUpdate(pos, state.setValue(xyz.l7ssha.lushathings.blocks.EternalFireSourceRecombinatorBlock.LIT, isProcessing));
         }
     }
 
@@ -147,7 +152,7 @@ public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implem
 
     @Override
     public int getMaxExtract() {
-        return 1024;
+        return 2048;
     }
 
     @Override
@@ -162,7 +167,7 @@ public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implem
 
     @Override
     public int getSourceCapacity() {
-        return MAX_SOURCE_STORAGE;
+        return 4096;
     }
 
     @Override

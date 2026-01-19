@@ -98,5 +98,17 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .addInput(Ingredient.of(Items.SLIME_BALL), 2)
                 .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get().asItem()))
                 .save(output);
+                
+        // Add recipe for EternalFireSourceRecombinatorBlock if Ars Nouveau is loaded
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR.get())
+                .pattern("FSF")
+                .pattern("SMS")
+                .pattern("BSB")
+                .define('F', Items.FURNACE)
+                .define('S', Items.SOUL_SAND)
+                .define('M', Items.NETHER_STAR)
+                .define('B', Items.BLAZE_ROD)
+                .unlockedBy("has_nether_star", has(Items.NETHER_STAR))
+                .save(output, "eternal_fire_source_recombinator");
     }
 }

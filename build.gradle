@@ -28,6 +28,45 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.dev"
     }
+    maven {
+        name = "CurseMaven"
+        url = uri("https://cursemaven.com")
+        content {
+            includeGroup("curse.maven")
+        }
+    }
+
+    maven {
+        name = "GeckoLib"
+        url = uri("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
+        content {
+            includeGroup("software.bernie.geckolib")
+        }
+    }
+
+    maven {
+        name = "Illusive Soulworks"
+        url = uri("https://maven.theillusivec4.top/")
+        content {
+            includeGroup("com.illusivesoulworks.caelus")
+        }
+    }
+
+    maven {
+        name = "Minecraft Forge"
+        url = uri("https://maven.minecraftforge.net/")
+        content {
+            includeGroup("com.github.glitchfiend")
+        }
+    }
+
+    maven {
+        name = "OctoStudios"
+        url = uri("https://maven.octo-studios.com/releases")
+        content {
+            includeGroup("top.theillusivec4.curios")
+        }
+    }
 }
 
 base {

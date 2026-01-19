@@ -14,6 +14,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import xyz.l7ssha.lushathings.blockentity.EternalFireSourceRecombinatorBlockEntity;
 import xyz.l7ssha.lushathings.datagen.ModBlockStateProvider;
 import xyz.l7ssha.lushathings.datagen.ModRecipeProvider;
+import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -45,6 +46,14 @@ public class ModEventBus {
             event.registerBlockEntity(
                     AECapabilities.IN_WORLD_GRID_NODE_HOST,
                     lushathings.REPROCESSOR_ME_BLOCK_ENTITY.get(),
+                    (be, context) -> be
+            );
+        }
+
+        if (ModList.get().isLoaded("ars_nouveau")) {
+            event.registerBlockEntity(
+                    CapabilityRegistry.SOURCE_CAPABILITY,
+                    lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY.get(),
                     (be, context) -> be
             );
         }
