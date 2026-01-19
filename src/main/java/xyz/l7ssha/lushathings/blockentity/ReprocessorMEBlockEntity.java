@@ -18,7 +18,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -84,7 +83,7 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
 
         var inventory = gridNode.getStorageService().getInventory();
 
-        var actionSource = new ActionSource(blockEntity);
+        var actionSource = IActionSource.ofMachine(blockEntity);
 
         for (int slot = 0; slot < blockEntity.outputHandler.getSlots(); slot++) {
             var stack = blockEntity.outputHandler.extractItem(slot, 64, true);
@@ -298,29 +297,6 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         @Override
         public AEKey getRemainingKey(AEKey template) {
             return null;
-        }
-    }
-
-    private static class ActionSource implements IActionSource {
-        private final IActionHost actionHost;
-
-        private ActionSource(IActionHost blockEntity) {
-            this.actionHost = blockEntity;
-        }
-
-        @Override
-        public Optional<Player> player() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<IActionHost> machine() {
-            return Optional.of(actionHost);
-        }
-
-        @Override
-        public <T> Optional<T> context(Class<T> key) {
-            return Optional.empty();
         }
     }
 }
