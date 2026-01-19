@@ -86,6 +86,7 @@ public class lushathings {
     public static final DeferredBlock<Block> REPROCESSOR_OUTPUT_BLOCK = registerBlock("reprocessor_output_block", () -> new ReprocessorOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_INPUT_OUTPUT_BLOCK = registerBlock("reprocessor_input_output_block", () -> new ReprocessorInputOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_ENERGY_INPUT_BLOCK = registerBlock("reprocessor_energy_input_block", () -> new ReprocessorEnergyInputBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> ETERNAL_FIRE_SOURCE_RECOMBINATOR = registerBlock("eternal_fire_source_recombinator", () -> new EternalFireSourceRecombinatorBlock(BlockBehaviour.Properties.of()));
     public static DeferredBlock<Block> REPROCESSOR_ME_BLOCK;
 
     public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
@@ -107,6 +108,10 @@ public class lushathings {
     public static final Supplier<BlockEntityType<ReprocessorInputOutputBlockEntity>> REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_input_output_block_entity",
             () -> BlockEntityType.Builder.of(ReprocessorInputOutputBlockEntity::new, REPROCESSOR_INPUT_OUTPUT_BLOCK.get()).build(null)
+    );
+    public static final Supplier<BlockEntityType<EternalFireSourceRecombinatorBlockEntity>> ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "eternal_fire_source_recombinator_block_entity",
+            () -> BlockEntityType.Builder.of(EternalFireSourceRecombinatorBlockEntity::new, ETERNAL_FIRE_SOURCE_RECOMBINATOR.get()).build(null)
     );
     public static Supplier<BlockEntityType<ReprocessorMEBlockEntity>> REPROCESSOR_ME_BLOCK_ENTITY;
 
@@ -147,6 +152,7 @@ public class lushathings {
                 output.accept(REPROCESSOR_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_INPUT_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_ENERGY_INPUT_BLOCK.get());
+                output.accept(ETERNAL_FIRE_SOURCE_RECOMBINATOR.get());
                 output.accept(REPROCESSOR_ME_BLOCK.get());
             }).build());
 

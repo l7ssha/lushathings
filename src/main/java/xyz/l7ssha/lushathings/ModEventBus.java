@@ -11,6 +11,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import xyz.l7ssha.lushathings.blockentity.EternalFireSourceRecombinatorBlockEntity;
 import xyz.l7ssha.lushathings.datagen.ModBlockStateProvider;
 import xyz.l7ssha.lushathings.datagen.ModRecipeProvider;
 
@@ -38,6 +39,7 @@ public class ModEventBus {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_OUTPUT_BLOCK_ENTITY.get(), (be, context) -> be.getItemHandler());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(), (be, context) -> be.getCombinedInventory());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK_ENTITY.get(), (be, context) -> be.getEnergyStorage());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY.get(), (be, context) -> ((EternalFireSourceRecombinatorBlockEntity) be).getEnergyStorage());
 
         if (ModList.get().isLoaded("ae2")) {
             event.registerBlockEntity(
