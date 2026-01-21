@@ -1,9 +1,9 @@
 package xyz.l7ssha.lushathings.blockentity;
 
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import org.jetbrains.annotations.Nullable;
+import xyz.l7ssha.lushathings.blockentity.util.InventoryConfig;
+
+import javax.annotation.Nullable;
 
 public interface ReprocessorIOHatch {
     @Nullable
@@ -11,4 +11,7 @@ public interface ReprocessorIOHatch {
 
     @Nullable
     IItemHandlerModifiable getOutputInventory();
+
+    @Nullable
+    InventoryConfig getInventoryConfig();
 }

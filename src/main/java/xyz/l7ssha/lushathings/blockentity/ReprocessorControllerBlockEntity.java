@@ -3,34 +3,32 @@ package xyz.l7ssha.lushathings.blockentity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
+import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
 
-import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
-
-// TODO: Menu implements MenuProvider
 public class ReprocessorControllerBlockEntity extends BlockEntity implements MenuProvider {
     public static final int STATUS_OK = 0;
     public static final int STATUS_NO_INPUT_HATCH = 1;
@@ -81,7 +79,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
             @Override
             public int getCount() {
-                return 16;
+                return 4;
             }
         };
     }
@@ -121,6 +119,46 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     }
 
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
+        validateMultiblock();
+
+        Optional<RecipeHolder<ReprocessorRecipe>> currentRecipe = findRecipe();
+        if (currentRecipe.isEmpty()) {
+            this.status = STATUS_NO_RECIPE;
+            this.progress = 0;
+            this.currentRecipeId = null;
+            this.energyCostLastTick = 0;
+            return;
+        }
+
+        this.currentRecipeId = currentRecipe.get().id();
+
+        this.status = getCannotCraftReason(currentRecipe.get().value());
+        if (this.status != STATUS_OK) {
+            this.energyCostLastTick = 0;
+            return;
+        }
+
+        var recipe = currentRecipe.get().value();
+        this.maxProgress = recipe.craftingTime();
+
+        progress++;
+        this.energyCostLastTick = recipe.energyCost();
+
+        if (!extractEnergyFromHatches(recipe.energyCost())) {
+            this.status = STATUS_NO_ENERGY;
+            progress = Math.max(0, progress - 1);
+            return;
+        }
+
+        if (progress >= maxProgress) {
+            progress = 0;
+            craftItem(recipe);
+        }
+
+        setChanged(level, blockPos, blockState);
+    }
+
+    private void validateMultiblock() {
         if (inputHatches.isEmpty()) {
             this.status = STATUS_NO_INPUT_HATCH;
             this.progress = 0;
@@ -137,43 +175,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             return;
         }
 
-        Optional<RecipeHolder<ReprocessorRecipe>> currentRecipe = findRecipe();
-        if (currentRecipe.isEmpty()) {
-            this.status = STATUS_NO_RECIPE;
-            this.progress = 0;
-            this.currentRecipeId = null;
-            this.energyCostLastTick = 0;
-            return;
-        }
-
-        this.currentRecipeId = currentRecipe.get().id();
-
-        int cannotCraftReason = getCannotCraftReason(currentRecipe.get().value());
-        if (cannotCraftReason != STATUS_OK) {
-            this.status = cannotCraftReason;
-            this.energyCostLastTick = 0;
-            return;
-        }
-
-        this.status = STATUS_OK;
-
-        ReprocessorRecipe recipe = currentRecipe.get().value();
-        this.maxProgress = recipe.craftingTime();
-
-        progress++;
-        this.energyCostLastTick = recipe.energyCost();
-        if (!extractEnergyFromHatches(recipe.energyCost())) {
-            this.status = STATUS_NO_ENERGY;
-            progress = Math.max(0, progress - 1);
-            return;
-        }
-
-        if (progress >= maxProgress) {
-            progress = 0;
-            craftItem(recipe);
-        }
-
-        setChanged(level, blockPos, blockState);
+        // TODO: Properly validate rest of structure
     }
 
     public String getCurrentRecipeId() {
@@ -324,6 +326,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
                 }
             }
         }
+
         return total >= required;
     }
 

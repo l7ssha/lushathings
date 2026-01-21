@@ -35,7 +35,6 @@ public class ReprocessorEnergyInputBlockEntity extends BlockEntity implements Me
 
         @Override
         public int extractEnergy(int maxExtract, boolean simulate) {
-            // input-only from outside
             return 0;
         }
 

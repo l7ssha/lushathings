@@ -7,9 +7,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorInputBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
+import xyz.l7ssha.lushathings.lushathings;
 
 public class ReprocessorHatchScreen extends AbstractContainerScreen<ReprocessorHatchMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_hatch_gui.png");

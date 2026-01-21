@@ -26,10 +26,14 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
+import xyz.l7ssha.lushathings.blockentity.util.InventoryConfig;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 public class ReprocessorMEBlockEntity extends BlockEntity implements ReprocessorIOHatch, IActionHost, IInWorldGridNodeHost, IGridNodeListener<ReprocessorMEBlockEntity>, ICraftingProvider {
     protected final IManagedGridNode gridNode;
@@ -82,7 +86,6 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         }
 
         var inventory = gridNode.getStorageService().getInventory();
-
         var actionSource = IActionSource.ofMachine(blockEntity);
 
         for (int slot = 0; slot < blockEntity.outputHandler.getSlots(); slot++) {
@@ -121,6 +124,11 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
     @Override
     public @Nullable IItemHandlerModifiable getOutputInventory() {
         return this.outputHandler;
+    }
+
+    @Override
+    public InventoryConfig getInventoryConfig() {
+        return null;
     }
 
     @Override

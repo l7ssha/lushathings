@@ -42,15 +42,19 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
         this.autoIOState = new DataSlot() {
             @Override
             public int get() {
-                if (blockEntity instanceof ReprocessorInputBlockEntity in) return in.autoPull ? 1 : 0;
-                if (blockEntity instanceof ReprocessorOutputBlockEntity out) return out.autoPush ? 1 : 0;
+                if (blockEntity instanceof ReprocessorInputBlockEntity in)
+                    return in.getInventoryConfig().isAutoPull() ? 1 : 0;
+                if (blockEntity instanceof ReprocessorOutputBlockEntity out)
+                    return out.getInventoryConfig().isAutoPush() ? 1 : 0;
                 return 0;
             }
 
             @Override
             public void set(int value) {
-                if (blockEntity instanceof ReprocessorInputBlockEntity in) in.autoPull = value != 0;
-                if (blockEntity instanceof ReprocessorOutputBlockEntity out) out.autoPush = value != 0;
+                if (blockEntity instanceof ReprocessorInputBlockEntity in)
+                    in.getInventoryConfig().setAutoPull(value != 0);
+                if (blockEntity instanceof ReprocessorOutputBlockEntity out)
+                    out.getInventoryConfig().setAutoPush(value != 0);
             }
         };
         this.addDataSlot(this.autoIOState);
@@ -68,14 +72,16 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(Player player, int id) {
         if (id == 0) {
             if (blockEntity instanceof ReprocessorInputBlockEntity in) {
-                in.autoPull = !in.autoPull;
+                in.getInventoryConfig().setAutoPull(!in.getInventoryConfig().isAutoPull());
                 in.setChanged();
             } else if (blockEntity instanceof ReprocessorOutputBlockEntity out) {
-                out.autoPush = !out.autoPush;
+                out.getInventoryConfig().setAutoPush(!out.getInventoryConfig().isAutoPush());
                 out.setChanged();
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -129,13 +135,11 @@ public class ReprocessorHatchMenu extends AbstractContainerMenu {
         ItemStack copy = sourceStack.copy();
 
         final int hatchSlots = 9;
-        final int playerInvStart = hatchSlots;
-        final int playerInvEnd = playerInvStart + 27;
-        final int hotbarStart = playerInvEnd;
+        final int hotbarStart = hatchSlots + 27;
         final int hotbarEnd = hotbarStart + 9;
 
         if (index < hatchSlots) {
-            if (!this.moveItemStackTo(sourceStack, playerInvStart, hotbarEnd, true)) {
+            if (!this.moveItemStackTo(sourceStack, hatchSlots, hotbarEnd, true)) {
                 return ItemStack.EMPTY;
             }
         } else {

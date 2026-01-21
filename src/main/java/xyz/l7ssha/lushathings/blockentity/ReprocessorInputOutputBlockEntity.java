@@ -1,6 +1,7 @@
 package xyz.l7ssha.lushathings.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,17 +19,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.Nullable;
+import xyz.l7ssha.lushathings.blockentity.util.InventoryConfig;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 import xyz.l7ssha.lushathings.screen.ReprocessorInputOutputMenu;
 
+import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pullFromNeighbors;
+import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pushToNeighbors;
+
 public class ReprocessorInputOutputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorIOHatch {
-    public boolean autoPull = false;
-    public boolean autoPush = false;
+    private final InventoryConfig inventoryConfig = new InventoryConfig();
 
     public final ItemStackHandler inputHandler = new ItemStackHandler(9) {
         @Override
@@ -91,6 +94,12 @@ public class ReprocessorInputOutputBlockEntity extends BlockEntity implements Me
     }
 
     @Override
+    public InventoryConfig getInventoryConfig() {
+        return inventoryConfig;
+    }
+
+
+    @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new ReprocessorInputOutputMenu(containerId, inventory, this);
     }
@@ -100,72 +109,16 @@ public class ReprocessorInputOutputBlockEntity extends BlockEntity implements Me
         super.saveAdditional(tag, registries);
         tag.put("inputInventory", inputHandler.serializeNBT(registries));
         tag.put("outputInventory", outputHandler.serializeNBT(registries));
-        tag.putBoolean("autoPull", autoPull);
-        tag.putBoolean("autoPush", autoPush);
+        tag.put("inventoryConfig", inventoryConfig.serializeNBT());
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (tag.contains("inputInventory")) {
-            inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
-        }
-        if (tag.contains("outputInventory")) {
-            outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
-        }
-        if (tag.contains("autoPull")) {
-            autoPull = tag.getBoolean("autoPull");
-        }
-        if (tag.contains("autoPush")) {
-            autoPush = tag.getBoolean("autoPush");
-        }
-    }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, ReprocessorInputOutputBlockEntity be) {
-        if (level.isClientSide || level.getGameTime() % 20 != 0) {
-            return;
-        }
-
-        // Logic from both input and output BEs
-        if (be.autoPull || be.autoPush) {
-             for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
-                BlockPos neighborPos = pos.relative(dir);
-                IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
-                if (neighbor != null) {
-                    // Pull logic
-                    if (be.autoPull) {
-                         for (int slot = 0; slot < neighbor.getSlots(); slot++) {
-                            ItemStack stack = neighbor.extractItem(slot, 64, true);
-                            if (!stack.isEmpty()) {
-                                ItemStack remaining = ItemHandlerHelper.insertItemStacked(be.inputHandler, stack, true);
-                                int toMove = stack.getCount() - remaining.getCount();
-
-                                if (toMove > 0) {
-                                    ItemStack extracted = neighbor.extractItem(slot, toMove, false);
-                                    ItemHandlerHelper.insertItemStacked(be.inputHandler, extracted, false);
-                                }
-                            }
-                        }
-                    }
-
-                    // Push logic
-                    if (be.autoPush) {
-                        for (int slot = 0; slot < be.outputHandler.getSlots(); slot++) {
-                            ItemStack stack = be.outputHandler.extractItem(slot, 64, true);
-                            if (!stack.isEmpty()) {
-                                ItemStack remaining = ItemHandlerHelper.insertItemStacked(neighbor, stack, true);
-                                int toMove = stack.getCount() - remaining.getCount();
-
-                                if (toMove > 0) {
-                                    ItemStack extracted = be.outputHandler.extractItem(slot, toMove, false);
-                                    ItemHandlerHelper.insertItemStacked(neighbor, extracted, false);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
+        outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
+        inventoryConfig.deserializeNBT(tag.getCompound("inventoryConfig"));
     }
 
     @Override
@@ -176,5 +129,24 @@ public class ReprocessorInputOutputBlockEntity extends BlockEntity implements Me
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return saveWithoutMetadata(registries);
+    }
+
+    public static void tick(Level level, BlockPos pos, BlockState state, ReprocessorInputOutputBlockEntity be) {
+        if (level.isClientSide || level.getGameTime() % 20 != 0) {
+            return;
+        }
+
+        if (be.inventoryConfig.isAutoPull() || be.inventoryConfig.isAutoPush()) {
+            for (Direction dir : Direction.values()) {
+                BlockPos neighborPos = pos.relative(dir);
+                IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+                if (neighbor == null) {
+                    continue;
+                }
+
+                pullFromNeighbors(be, neighbor);
+                pushToNeighbors(be, neighbor);
+            }
+        }
     }
 }

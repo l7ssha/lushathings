@@ -7,15 +7,14 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
+import xyz.l7ssha.lushathings.lushathings;
 
-/**
- * Controller UI: only displays energy + current recipe/progress text.
- */
 public class ReprocessorControllerScreen extends AbstractContainerScreen<ReprocessorControllerMenu> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_controller_gui.png");
-
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            lushathings.MODID,
+            "textures/gui/reprocessor_controller_gui.png"
+    );
 
     public ReprocessorControllerScreen(ReprocessorControllerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);

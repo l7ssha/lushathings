@@ -39,15 +39,15 @@ public class ReprocessorInputOutputMenu extends AbstractContainerMenu {
             @Override
             public int get() {
                 int val = 0;
-                if (blockEntity.autoPull) val |= 1;
-                if (blockEntity.autoPush) val |= 2;
+                if (blockEntity.getInventoryConfig().isAutoPull()) val |= 1;
+                if (blockEntity.getInventoryConfig().isAutoPush()) val |= 2;
                 return val;
             }
 
             @Override
             public void set(int value) {
-                blockEntity.autoPull = (value & 1) != 0;
-                blockEntity.autoPush = (value & 2) != 0;
+                blockEntity.getInventoryConfig().setAutoPull((value & 1) != 0);
+                blockEntity.getInventoryConfig().setAutoPush((value & 2) != 0);
             }
         };
         this.addDataSlot(this.autoIOState);
@@ -67,12 +67,12 @@ public class ReprocessorInputOutputMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == 0) { // Toggle Pull
-            blockEntity.autoPull = !blockEntity.autoPull;
+        if (id == 0) {
+            blockEntity.getInventoryConfig().setAutoPull(!blockEntity.getInventoryConfig().isAutoPull());
             blockEntity.setChanged();
             return true;
-        } else if (id == 1) { // Toggle Push
-            blockEntity.autoPush = !blockEntity.autoPush;
+        } else if (id == 1) {
+            blockEntity.getInventoryConfig().setAutoPush(!blockEntity.getInventoryConfig().isAutoPush());
             blockEntity.setChanged();
             return true;
         }
@@ -133,16 +133,15 @@ public class ReprocessorInputOutputMenu extends AbstractContainerMenu {
 
         final int inputSlotsStart = 0;
         final int inputSlotsEnd = 9;
-        final int outputSlotsStart = 9;
         final int outputSlotsEnd = 18;
         final int playerInvStart = 18;
         final int hotbarEnd = playerInvStart + 36;
 
-        if (index < outputSlotsEnd) { // From hatch (either input or output handler)
+        if (index < outputSlotsEnd) {
             if (!this.moveItemStackTo(sourceStack, playerInvStart, hotbarEnd, true)) {
                 return ItemStack.EMPTY;
             }
-        } else { // From player
+        } else {
             if (!this.moveItemStackTo(sourceStack, inputSlotsStart, inputSlotsEnd, false)) {
                 return ItemStack.EMPTY;
             }
