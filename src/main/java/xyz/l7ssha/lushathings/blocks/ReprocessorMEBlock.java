@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorMEBlockEntity;
-import xyz.l7ssha.lushathings.blockentity.ReprocessorOutputBlockEntity;
 import xyz.l7ssha.lushathings.lushathings;
 
 public class ReprocessorMEBlock extends BaseEntityBlock implements ReprocessorMultiblock {

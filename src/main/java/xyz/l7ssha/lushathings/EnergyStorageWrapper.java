@@ -30,10 +30,4 @@ public class EnergyStorageWrapper extends EnergyStorage {
 
         return receiveEnergy;
     }
-
-    public int setEnergy(int energy) {
-        this.energy = energy;
-
-        return energy;
-    }
 }

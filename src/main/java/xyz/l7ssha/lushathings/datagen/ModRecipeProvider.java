@@ -1,16 +1,13 @@
 package xyz.l7ssha.lushathings.datagen;
 
+import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
+import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import org.jetbrains.annotations.NotNull;
 import xyz.l7ssha.lushathings.datagen.builder.ReprocessorRecipeBuilder;
@@ -64,6 +61,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
                 .save(output);
 
+//        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_ME_BLOCK.get())
+//                .pattern(" I ")
+//                .pattern(" O ")
+//                .pattern("HHH")
+//                .define('I', lushathings.REPROCESSOR_INPUT_BLOCK.get())
+//                .define('O', lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
+//                .define('H', ---)
+//                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+//                .save(output);
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK.get())
                 .requires(lushathings.REPROCESSOR_INPUT_BLOCK.get())
                 .requires(lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
@@ -98,16 +105,17 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .addInput(Ingredient.of(Items.SLIME_BALL), 2)
                 .unlockedBy("has_reprocessor", has(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get().asItem()))
                 .save(output);
-                
-        // Add recipe for EternalFireSourceRecombinatorBlock if Ars Nouveau is loaded
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR.get())
-                .pattern("FSF")
-                .pattern("SMS")
-                .pattern("BSB")
+                .pattern("gMg")
+                .pattern("SGS")
+                .pattern("FAF")
                 .define('F', Items.FURNACE)
                 .define('S', Items.SOUL_SAND)
-                .define('M', Items.NETHER_STAR)
-                .define('B', Items.BLAZE_ROD)
+                .define('M', BlockRegistry.SOURCE_JAR.get())
+                .define('A', BlockRegistry.VOLCANIC_BLOCK.get())
+                .define('g', ItemsRegistry.SOURCE_GEM.get())
+                .define('G', BlockRegistry.SOURCE_GEM_BLOCK.get())
                 .unlockedBy("has_nether_star", has(Items.NETHER_STAR))
                 .save(output, "eternal_fire_source_recombinator");
     }

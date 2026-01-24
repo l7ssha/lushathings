@@ -42,14 +42,12 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private List<BlockPos> energyInputs = new ArrayList<>();
 
     protected final ContainerData data;
+
     private int progress = 0;
     private int maxProgress = 600;
     private BlockPos centerPos = null;
-
     private int status = STATUS_NO_RECIPE;
-
     private @Nullable ResourceLocation currentRecipeId = null;
-
     private int energyCostLastTick = 0;
 
     public ReprocessorControllerBlockEntity(BlockPos pos, BlockState blockState) {
