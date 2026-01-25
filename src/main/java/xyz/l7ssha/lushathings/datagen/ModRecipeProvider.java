@@ -1,5 +1,6 @@
 package xyz.l7ssha.lushathings.datagen;
 
+import appeng.core.definitions.AEBlocks;
 import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
 import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
 import net.minecraft.core.HolderLookup;
@@ -61,15 +62,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
                 .save(output);
 
-//        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_ME_BLOCK.get())
-//                .pattern(" I ")
-//                .pattern(" O ")
-//                .pattern("HHH")
-//                .define('I', lushathings.REPROCESSOR_INPUT_BLOCK.get())
-//                .define('O', lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
-//                .define('H', ---)
-//                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
-//                .save(output);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_ME_BLOCK.get())
+                .pattern(" I ")
+                .pattern(" O ")
+                .pattern("PJP")
+                .define('I', lushathings.REPROCESSOR_INPUT_BLOCK.get())
+                .define('O', lushathings.REPROCESSOR_OUTPUT_BLOCK.get())
+                .define('P', AEBlocks.PATTERN_PROVIDER)
+                .define('J', AEBlocks.INTERFACE)
+                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+                .save(output);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK.get())
                 .requires(lushathings.REPROCESSOR_INPUT_BLOCK.get())

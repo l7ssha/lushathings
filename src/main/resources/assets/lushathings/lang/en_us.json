@@ -2,14 +2,15 @@
   "itemGroup.lushathings": "LushaThings",
 
   "block.lushathings.eternal_fire_source_recombinator": "Eternal Fire Source Recombinator",
-   
+
   "block.lushathings.reprocessor_controller_block": "Reprocessor Controller",
   "block.lushathings.reprocessor_structure_block": "Reprocessor Structure Block",
   "block.lushathings.reprocessor_input_block": "Reprocessor Input Hatch",
   "block.lushathings.reprocessor_output_block": "Reprocessor Output Hatch",
   "block.lushathings.reprocessor_input_output_block": "Reprocessor Input/Output Hatch",
   "block.lushathings.reprocessor_energy_input_block": "Reprocessor Energy Input",
-  
+  "block.lushathings.reprocessor_me_block": "Reprocessor ME Interface",
+
   "menu.lushathings.reprocessor_hatch": "Reprocessor Hatch",
   "menu.lushathings.reprocessor_energy_input": "Reprocessor Energy Input",
 
@@ -31,10 +32,9 @@
   "lushathings.screen.hatch.push": "Push",
   "lushathings.screen.hatch.on": "ON",
   "lushathings.screen.hatch.off": "OFF",
-
-  "lushathings.configuration.title": "lusha things Configs",
-  "lushathings.configuration.section.lushathings.common.toml": "lusha things Configs",
-  "lushathings.configuration.section.lushathings.common.toml.title": "lusha things Configs",
+  "lushathings.configuration.title": "LushaThings Configs",
+  "lushathings.configuration.section.lushathings.common.toml": "LushaThings Configs",
+  "lushathings.configuration.section.lushathings.common.toml.title": "LushaThings Configs",
   "lushathings.configuration.items": "Item List",
   "lushathings.configuration.logDirtBlock": "Log Dirt Block",
   "lushathings.configuration.magicNumberIntroduction": "Magic Number Text",

@@ -2,13 +2,14 @@
   "itemGroup.lushathings": "LushaThings",
 
   "block.lushathings.eternal_fire_source_recombinator": "Rekombinator Wiecznego \u0179r\u00f3d\u0142a Ognia",
-   
+
   "block.lushathings.reprocessor_controller_block": "Sterownik Przetwornika",
   "block.lushathings.reprocessor_structure_block": "Blok Strukturalny Przetwornika",
   "block.lushathings.reprocessor_input_block": "Właz Wejściowy Przetwornika",
   "block.lushathings.reprocessor_output_block": "Właz Wyjściowy Przetwornika",
   "block.lushathings.reprocessor_energy_input_block": "Wejście Energii Przetwornika",
-  
+  "block.lushathings.reprocessor_me_block": "Interfejs ME Przetwornika",
+
   "menu.lushathings.reprocessor_hatch": "Właz Przetwornika",
   "menu.lushathings.reprocessor_energy_input": "Wejście Energii Przetwornika",
 
