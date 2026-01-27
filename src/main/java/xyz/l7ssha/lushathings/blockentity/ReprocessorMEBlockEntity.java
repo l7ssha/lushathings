@@ -252,8 +252,6 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         meConfig.deserializeNBT(tag.getCompound("meConfig"));
 
         gridNode.loadFromNBT(tag);
-
-        GridHelper.onFirstTick(this, ReprocessorMEBlockEntity::onReady);
     }
 
     @Override
