@@ -1,7 +1,6 @@
 package xyz.l7ssha.lushathings.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -56,6 +55,7 @@ public class ReprocessorMEScreen extends AbstractContainerScreen<ReprocessorMEMe
         if (this.patternsButton != null) {
             this.patternsButton.setMessage(getPatternsButtonText());
         }
+
         if (this.powerButton != null) {
             this.powerButton.setMessage(getPowerButtonText());
         }
@@ -93,4 +93,3 @@ public class ReprocessorMEScreen extends AbstractContainerScreen<ReprocessorMEMe
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
     }
 }
-

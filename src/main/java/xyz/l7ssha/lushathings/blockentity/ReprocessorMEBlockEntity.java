@@ -1,14 +1,14 @@
 package xyz.l7ssha.lushathings.blockentity;
 
 import appeng.api.config.Actionable;
+import appeng.api.config.PowerMultiplier;
+import appeng.api.config.PowerUnit;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.networking.*;
 import appeng.api.networking.crafting.ICraftingProvider;
 import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
-import appeng.api.config.PowerUnit;
-import appeng.api.config.PowerMultiplier;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
@@ -18,10 +18,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -169,42 +169,25 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         return meConfig;
     }
 
-    public boolean isProvidingBuiltinPatterns() {
-        return meConfig.isProvidingBuiltinPatterns();
-    }
-
     public void setProvidingBuiltinPatterns(boolean provideBuiltinPatterns) {
-        boolean changed = this.meConfig.isProvidingBuiltinPatterns() != provideBuiltinPatterns;
         this.meConfig.setProvidingBuiltinPatterns(provideBuiltinPatterns);
 
-        if (changed) {
-            ICraftingProvider.requestUpdate(this.gridNode);
-            setChanged();
-            if (level != null) {
-                if (!level.isClientSide) {
-                    level.blockEntityChanged(getBlockPos());
-                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                }
-            }
+        ICraftingProvider.requestUpdate(this.gridNode);
+        setChanged();
+
+        if (level != null && !level.isClientSide) {
+            level.blockEntityChanged(getBlockPos());
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
 
-    public boolean isAllowingNetworkPower() {
-        return meConfig.isAllowingNetworkPower();
-    }
-
     public void setAllowingNetworkPower(boolean allowNetworkPower) {
-        boolean changed = this.meConfig.isAllowingNetworkPower() != allowNetworkPower;
         this.meConfig.setAllowingNetworkPower(allowNetworkPower);
 
-        if (changed) {
-            setChanged();
-            if (level != null) {
-                if (!level.isClientSide) {
-                    level.blockEntityChanged(getBlockPos());
-                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                }
-            }
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.blockEntityChanged(getBlockPos());
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
 

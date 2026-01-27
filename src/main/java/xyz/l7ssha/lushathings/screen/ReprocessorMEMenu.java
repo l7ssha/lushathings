@@ -8,8 +8,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorMEBlockEntity;
 import xyz.l7ssha.lushathings.lushathings;
 
@@ -19,39 +17,34 @@ public class ReprocessorMEMenu extends AbstractContainerMenu {
     private final DataSlot allowNetworkPower;
 
     public ReprocessorMEMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
-        this(containerId, playerInventory, playerInventory.player.level().getBlockEntity(buf.readBlockPos()));
+        this(containerId, playerInventory, (ReprocessorMEBlockEntity) playerInventory.player.level().getBlockEntity(buf.readBlockPos()));
     }
 
-    public ReprocessorMEMenu(int containerId, Inventory playerInventory, @Nullable BlockEntity blockEntity) {
+    public ReprocessorMEMenu(int containerId, Inventory playerInventory, ReprocessorMEBlockEntity blockEntity) {
         super(lushathings.REPROCESSOR_ME_MENU.get(), containerId);
-
-        if (!(blockEntity instanceof ReprocessorMEBlockEntity be)) {
-            throw new IllegalStateException("Invalid block entity for ME menu");
-        }
-
-        this.blockEntity = be;
+        this.blockEntity = blockEntity;
 
         this.providePatterns = new DataSlot() {
             @Override
             public int get() {
-                return ReprocessorMEMenu.this.blockEntity.getMEConfig().isProvidingBuiltinPatterns() ? 1 : 0;
+                return blockEntity.getMEConfig().isProvidingBuiltinPatterns() ? 1 : 0;
             }
 
             @Override
             public void set(int value) {
-                ReprocessorMEMenu.this.blockEntity.getMEConfig().setProvidingBuiltinPatterns(value != 0);
+                blockEntity.setProvidingBuiltinPatterns(value == 1);
             }
         };
 
         this.allowNetworkPower = new DataSlot() {
             @Override
             public int get() {
-                return ReprocessorMEMenu.this.blockEntity.getMEConfig().isAllowingNetworkPower() ? 1 : 0;
+                return blockEntity.getMEConfig().isAllowingNetworkPower() ? 1 : 0;
             }
 
             @Override
             public void set(int value) {
-                ReprocessorMEMenu.this.blockEntity.getMEConfig().setAllowingNetworkPower(value != 0);
+                blockEntity.setAllowingNetworkPower(value == 1);
             }
         };
 
@@ -63,22 +56,20 @@ public class ReprocessorMEMenu extends AbstractContainerMenu {
     }
 
     public boolean isProvidingBuiltinPatterns() {
-        return this.providePatterns.get() != 0;
+        return this.providePatterns.get() == 1;
     }
 
     public boolean isAllowingNetworkPower() {
-        return this.allowNetworkPower.get() != 0;
+        return this.allowNetworkPower.get() == 1;
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == 0) {
             blockEntity.setProvidingBuiltinPatterns(!blockEntity.getMEConfig().isProvidingBuiltinPatterns());
-            blockEntity.setChanged();
             return true;
         } else if (id == 1) {
             blockEntity.setAllowingNetworkPower(!blockEntity.getMEConfig().isAllowingNetworkPower());
-            blockEntity.setChanged();
             return true;
         }
 
