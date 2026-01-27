@@ -40,6 +40,7 @@ import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 import xyz.l7ssha.lushathings.screen.ReprocessorInputOutputMenu;
+import xyz.l7ssha.lushathings.screen.ReprocessorMEMenu;
 
 import java.util.function.Supplier;
 
@@ -79,6 +80,9 @@ public class lushathings {
 
     public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorEnergyInputMenu>> REPROCESSOR_ENERGY_INPUT_MENU =
             registerMenuType("reprocessor_energy_input_menu", ReprocessorEnergyInputMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<ReprocessorMEMenu>> REPROCESSOR_ME_MENU =
+            registerMenuType("reprocessor_me_menu", ReprocessorMEMenu::new);
 
     public static final DeferredBlock<Block> REPROCESSOR_CONTROLLER_BLOCK = registerBlock("reprocessor_controller_block", () -> new ReprocessorControllerBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_STRUCTURE_BLOCK = registerBlock("reprocessor_structure_block", () -> new ReprocessorStructureBlock(BlockBehaviour.Properties.of()));

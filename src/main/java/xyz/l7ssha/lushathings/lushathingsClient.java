@@ -13,6 +13,7 @@ import xyz.l7ssha.lushathings.screen.ReprocessorControllerScreen;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputScreen;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchScreen;
 import xyz.l7ssha.lushathings.screen.ReprocessorInputOutputScreen;
+import xyz.l7ssha.lushathings.screen.ReprocessorMEScreen;
 
 @Mod(value = lushathings.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = lushathings.MODID, value = Dist.CLIENT)
@@ -27,6 +28,7 @@ public class lushathingsClient {
         event.register(lushathings.REPROCESSOR_INPUT_OUTPUT_MENU.get(), ReprocessorInputOutputScreen::new);
         event.register(lushathings.REPROCESSOR_CONTROLLER_MENU.get(), ReprocessorControllerScreen::new);
         event.register(lushathings.REPROCESSOR_ENERGY_INPUT_MENU.get(), ReprocessorEnergyInputScreen::new);
+        event.register(lushathings.REPROCESSOR_ME_MENU.get(), ReprocessorMEScreen::new);
     }
 
     @SubscribeEvent

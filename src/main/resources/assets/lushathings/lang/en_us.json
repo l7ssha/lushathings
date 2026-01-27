@@ -32,6 +32,11 @@
   "lushathings.screen.hatch.push": "Push",
   "lushathings.screen.hatch.on": "ON",
   "lushathings.screen.hatch.off": "OFF",
+
+  "lushathings.screen.me.on": "ON",
+  "lushathings.screen.me.off": "OFF",
+  "lushathings.screen.me.patterns_btn": "Builtin patterns: %s",
+  "lushathings.screen.me.power_btn": "Use network power: %s",
   "lushathings.configuration.title": "LushaThings Configs",
   "lushathings.configuration.section.lushathings.common.toml": "LushaThings Configs",
   "lushathings.configuration.section.lushathings.common.toml.title": "LushaThings Configs",

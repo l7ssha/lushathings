@@ -317,10 +317,14 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private boolean hasEnergy(int required) {
         int total = 0;
         for (BlockPos energyPos : energyInputs) {
-            if (level.getBlockEntity(energyPos) instanceof ReprocessorEnergyInputBlockEntity be) {
-                total += be.getEnergyStorage().getEnergyStored();
+            if (level.getBlockEntity(energyPos) instanceof ReprocessorEnergyHatch hatch) {
+                total += Math.max(0, hatch.getEnergyStored());
+                if (total < required) {
+                    total += hatch.extractEnergyInternal(required - total, true);
+                }
+
                 if (total >= required) {
-                    return true;
+                     return true;
                 }
             }
         }
@@ -331,8 +335,8 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private boolean extractEnergyFromHatches(int required) {
         int remaining = required;
         for (BlockPos energyPos : energyInputs) {
-            if (level.getBlockEntity(energyPos) instanceof ReprocessorEnergyInputBlockEntity be) {
-                int extracted = be.extractEnergyInternal(remaining, false);
+            if (level.getBlockEntity(energyPos) instanceof ReprocessorEnergyHatch hatch) {
+                int extracted = hatch.extractEnergyInternal(remaining, false);
                 remaining -= extracted;
                 if (remaining <= 0) {
                     return true;

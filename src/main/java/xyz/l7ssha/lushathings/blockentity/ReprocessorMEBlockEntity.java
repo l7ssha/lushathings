@@ -4,8 +4,11 @@ import appeng.api.config.Actionable;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.networking.*;
 import appeng.api.networking.crafting.ICraftingProvider;
+import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.config.PowerUnit;
+import appeng.api.config.PowerMultiplier;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
@@ -18,6 +21,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,16 +35,19 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.util.InventoryConfig;
+import xyz.l7ssha.lushathings.blockentity.util.MEConfig;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
+import xyz.l7ssha.lushathings.screen.ReprocessorMEMenu;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class ReprocessorMEBlockEntity extends BlockEntity implements ReprocessorIOHatch, IActionHost, IInWorldGridNodeHost, IGridNodeListener<ReprocessorMEBlockEntity>, ICraftingProvider {
+public class ReprocessorMEBlockEntity extends BlockEntity implements ReprocessorIOHatch, ReprocessorEnergyHatch, MenuProvider, IActionHost, IInWorldGridNodeHost, IGridNodeListener<ReprocessorMEBlockEntity>, ICraftingProvider {
     protected final IManagedGridNode gridNode;
+    private final MEConfig meConfig = new MEConfig();
 
     public final ItemStackHandler inputHandler = new ItemStackHandler(9) {
         @Override
@@ -109,6 +120,17 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         this.setChanged();
     }
 
+    private void ensureNodeCreated() {
+        if (this.level == null) {
+            return;
+        }
+
+        var node = this.gridNode.getNode();
+        if (node == null || node.getGrid() == null) {
+            this.gridNode.create(this.level, getBlockPos());
+        }
+    }
+
     @Override
     public void clearRemoved() {
         super.clearRemoved();
@@ -143,12 +165,97 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
         return AECableType.SMART;
     }
 
+    public MEConfig getMEConfig() {
+        return meConfig;
+    }
+
+    public boolean isProvidingBuiltinPatterns() {
+        return meConfig.isProvidingBuiltinPatterns();
+    }
+
+    public void setProvidingBuiltinPatterns(boolean provideBuiltinPatterns) {
+        boolean changed = this.meConfig.isProvidingBuiltinPatterns() != provideBuiltinPatterns;
+        this.meConfig.setProvidingBuiltinPatterns(provideBuiltinPatterns);
+
+        if (changed) {
+            ICraftingProvider.requestUpdate(this.gridNode);
+            setChanged();
+            if (level != null) {
+                if (!level.isClientSide) {
+                    level.blockEntityChanged(getBlockPos());
+                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                }
+            }
+        }
+    }
+
+    public boolean isAllowingNetworkPower() {
+        return meConfig.isAllowingNetworkPower();
+    }
+
+    public void setAllowingNetworkPower(boolean allowNetworkPower) {
+        boolean changed = this.meConfig.isAllowingNetworkPower() != allowNetworkPower;
+        this.meConfig.setAllowingNetworkPower(allowNetworkPower);
+
+        if (changed) {
+            setChanged();
+            if (level != null) {
+                if (!level.isClientSide) {
+                    level.blockEntityChanged(getBlockPos());
+                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                }
+            }
+        }
+    }
+
+    @Override
+    public int extractEnergyInternal(int maxExtract, boolean simulate) {
+        if (!meConfig.isAllowingNetworkPower()) {
+            return 0;
+        }
+
+        ensureNodeCreated();
+
+        var node = this.gridNode.getNode();
+        if (node == null || node.getGrid() == null) {
+            return 0;
+        }
+
+        IEnergyService energy = node.getGrid().getEnergyService();
+
+        double requestedAe = PowerUnit.FE.convertTo(PowerUnit.AE, maxExtract);
+        double extractedAe = energy.extractAEPower(requestedAe, simulate ? Actionable.SIMULATE : Actionable.MODULATE, PowerMultiplier.ONE);
+        double extractedFe = PowerUnit.AE.convertTo(PowerUnit.FE, extractedAe);
+
+        return (int) Math.floor(extractedFe);
+    }
+
+    @Override
+    public int getEnergyStored() {
+        if (!meConfig.isAllowingNetworkPower()) {
+            return 0;
+        }
+
+        ensureNodeCreated();
+
+        var node = this.gridNode.getNode();
+        if (node == null || node.getGrid() == null) {
+            return 0;
+        }
+
+        double storedAe = node.getGrid().getEnergyService().getStoredPower();
+        double storedFe = PowerUnit.AE.convertTo(PowerUnit.FE, storedAe);
+
+        return (int) Math.floor(storedFe);
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
 
         tag.put("inputInventory", inputHandler.serializeNBT(registries));
         tag.put("outputInventory", outputHandler.serializeNBT(registries));
+        tag.put("meConfig", meConfig.serializeNBT());
 
         gridNode.saveToNBT(tag);
     }
@@ -157,13 +264,9 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
 
-        if (tag.contains("inputInventory")) {
-            inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
-        }
-
-        if (tag.contains("outputInventory")) {
-            outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
-        }
+        inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
+        outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
+        meConfig.deserializeNBT(tag.getCompound("meConfig"));
 
         gridNode.loadFromNBT(tag);
 
@@ -212,11 +315,27 @@ public class ReprocessorMEBlockEntity extends BlockEntity implements Reprocessor
 
     @Override
     public List<IPatternDetails> getAvailablePatterns() {
-        if (level == null) return null;
+        if (!meConfig.isProvidingBuiltinPatterns()) {
+            return List.of();
+        }
+
+        if (level == null) {
+            return List.of();
+        }
 
         var recipes = level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
 
         return recipes.stream().map(recipe -> (IPatternDetails) new ReprocessorRecipeAe2Wrapper(recipe.value())).toList();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.lushathings.reprocessor_me_block");
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        return new ReprocessorMEMenu(containerId, inventory, this);
     }
 
     @Override

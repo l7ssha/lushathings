@@ -21,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorControllerBlockEntity;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorIOHatch;
-import xyz.l7ssha.lushathings.blocks.ReprocessorEnergyInputBlock;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorEnergyHatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,7 +151,9 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
                         if (hatch.getOutputInventory() != null) {
                             outputHatches.add(target.immutable());
                         }
-                    } else if (state.getBlock() instanceof ReprocessorEnergyInputBlock) {
+                    }
+
+                    if (be instanceof ReprocessorEnergyHatch) {
                         energyInputs.add(target.immutable());
                     }
                 }

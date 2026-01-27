@@ -32,6 +32,11 @@
   "lushathings.screen.hatch.on": "WŁ",
   "lushathings.screen.hatch.off": "WYŁ",
 
+  "lushathings.screen.me.on": "WŁ",
+  "lushathings.screen.me.off": "WYŁ",
+  "lushathings.screen.me.patterns_btn": "Wbudowane receptury: %s",
+  "lushathings.screen.me.power_btn": "Zasilanie z sieci: %s",
+
   "lushathings.configuration.title": "Konfiguracja Lusha Things",
   "lushathings.configuration.section.lushathings.common.toml": "Konfiguracja Lusha Things",
   "lushathings.configuration.section.lushathings.common.toml.title": "Konfiguracja Lusha Things",

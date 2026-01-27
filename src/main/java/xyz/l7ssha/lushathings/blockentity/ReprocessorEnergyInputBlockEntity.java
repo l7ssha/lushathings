@@ -19,7 +19,7 @@ import xyz.l7ssha.lushathings.EnergyStorageWrapper;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
 
-public class ReprocessorEnergyInputBlockEntity extends BlockEntity implements MenuProvider {
+public class ReprocessorEnergyInputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorEnergyHatch {
     private final EnergyStorageWrapper energyStorage = new EnergyStorageWrapper(30000000, 150000, () -> {
         setChanged();
         if (level != null && !level.isClientSide) {
@@ -67,9 +67,14 @@ public class ReprocessorEnergyInputBlockEntity extends BlockEntity implements Me
         return externalEnergyStorage;
     }
 
-    /** Internal-only extraction used by the controller. */
+    @Override
     public int extractEnergyInternal(int maxExtract, boolean simulate) {
         return energyStorage.extractEnergy(maxExtract, simulate);
+    }
+
+    @Override
+    public int getEnergyStored() {
+        return energyStorage.getEnergyStored();
     }
 
     @Override
