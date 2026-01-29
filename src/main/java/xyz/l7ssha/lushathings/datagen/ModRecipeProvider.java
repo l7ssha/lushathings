@@ -42,6 +42,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_netherite_ingot", has(Items.NETHERITE_INGOT))
                 .save(output);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_BULK_PROCESSING_BLOCK.get())
+                .pattern("NDN")
+                .pattern("DSD")
+                .pattern("NDN")
+                .define('N', Items.NETHERITE_INGOT)
+                .define('D', Items.DIAMOND)
+                .define('S', lushathings.REPROCESSOR_STRUCTURE_BLOCK.get())
+                .unlockedBy("has_structure_block", has(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get()))
+                .save(output);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, lushathings.REPROCESSOR_INPUT_BLOCK.get())
                 .pattern("HHH")
                 .pattern(" S ")

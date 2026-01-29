@@ -40,6 +40,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private List<BlockPos> inputHatches = new ArrayList<>();
     private List<BlockPos> outputHatches = new ArrayList<>();
     private List<BlockPos> energyInputs = new ArrayList<>();
+    private List<BlockPos> bulkProcessingBlocks = new ArrayList<>();
 
     protected final ContainerData data;
 
@@ -116,6 +117,55 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         setChanged();
     }
 
+    public void setBulkProcessingBlocks(List<BlockPos> bulkProcessingBlocks) {
+        this.bulkProcessingBlocks = bulkProcessingBlocks;
+        setChanged();
+    }
+
+    public List<BlockPos> getBulkProcessingBlocks() {
+        return bulkProcessingBlocks;
+    }
+
+    private static final int DEFAULT_PROGRESS_PER_TICK = 1;
+    private static final int BULK_BLOCK_SPEED_MULTIPLIER = 2; // 2x faster per bulk block
+    private static final int BULK_BLOCK_ENERGY_MULTIPLIER = 4; // 4x energy usage per bulk block
+
+    private int getBulkProcessingBlockCount() {
+        // Defensive: callers may pass null via setBulkProcessingBlocks(...)
+        return bulkProcessingBlocks == null ? 0 : bulkProcessingBlocks.size();
+    }
+
+    private int getProgressPerTick() {
+        int bulkCount = getBulkProcessingBlockCount();
+        if (bulkCount <= 0) return DEFAULT_PROGRESS_PER_TICK;
+
+        // 2x faster per bulk block (i.e., speed = 1 * 2^bulkCount)
+        long speed = DEFAULT_PROGRESS_PER_TICK;
+        for (int i = 0; i < bulkCount; i++) {
+            speed *= BULK_BLOCK_SPEED_MULTIPLIER;
+            if (speed >= Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        }
+        return (int) speed;
+    }
+
+    private int getEnergyCostPerTick(ReprocessorRecipe recipe) {
+        if (recipe == null) {
+            return 0;
+        }
+
+        int base = Math.max(0, recipe.energyCost());
+        int bulkCount = getBulkProcessingBlockCount();
+        if (bulkCount <= 0) return base;
+
+        // 4x energy usage per bulk block (i.e., cost = base * 4^bulkCount)
+        long cost = base;
+        for (int i = 0; i < bulkCount; i++) {
+            cost *= BULK_BLOCK_ENERGY_MULTIPLIER;
+            if (cost >= Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        }
+        return (int) cost;
+    }
+
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
         validateMultiblock();
 
@@ -139,12 +189,13 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         var recipe = currentRecipe.get().value();
         this.maxProgress = recipe.craftingTime();
 
-        progress++;
-        this.energyCostLastTick = recipe.energyCost();
+        progress += getProgressPerTick();
+        int energyCost = getEnergyCostPerTick(recipe);
+        this.energyCostLastTick = energyCost;
 
-        if (!extractEnergyFromHatches(recipe.energyCost())) {
+        if (!extractEnergyFromHatches(energyCost)) {
             this.status = STATUS_NO_ENERGY;
-            progress = Math.max(0, progress - 1);
+            progress = Math.max(0, progress - getProgressPerTick());
             return;
         }
 
@@ -301,7 +352,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     }
 
     private int getCannotCraftReason(ReprocessorRecipe recipe) {
-        if (!hasEnergy(recipe.energyCost())) {
+        if (!hasEnergy(getEnergyCostPerTick(recipe))) {
             return STATUS_NO_ENERGY;
         }
 
@@ -391,6 +442,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         tag.putLongArray("reprocessor.inputHatches", inputHatches.stream().mapToLong(BlockPos::asLong).toArray());
         tag.putLongArray("reprocessor.outputHatches", outputHatches.stream().mapToLong(BlockPos::asLong).toArray());
         tag.putLongArray("reprocessor.energyInputs", energyInputs.stream().mapToLong(BlockPos::asLong).toArray());
+        tag.putLongArray("reprocessor.bulkProcessingBlocks", bulkProcessingBlocks.stream().mapToLong(BlockPos::asLong).toArray());
     }
 
     @Override
@@ -422,6 +474,13 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
             energyInputs.clear();
             for (long posLong : tag.getLongArray("reprocessor.energyInputs")) {
                 energyInputs.add(BlockPos.of(posLong));
+            }
+        }
+
+        if (tag.contains("reprocessor.bulkProcessingBlocks")) {
+            bulkProcessingBlocks.clear();
+            for (long posLong : tag.getLongArray("reprocessor.bulkProcessingBlocks")) {
+                bulkProcessingBlocks.add(BlockPos.of(posLong));
             }
         }
     }

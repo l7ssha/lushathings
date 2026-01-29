@@ -122,9 +122,18 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
     }
 
     private boolean isAreaValid(Level level, BlockPos center) {
+        int bulkProcessingBlocks = 0;
         for (BlockPos target : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
-            if (!(level.getBlockState(target).getBlock() instanceof ReprocessorMultiblock)) {
+            var block = level.getBlockState(target).getBlock();
+            if (!(block instanceof ReprocessorMultiblock)) {
                 return false;
+            }
+
+            if (block instanceof ReprocessorBulkProcessingBlock) {
+                bulkProcessingBlocks++;
+                if (bulkProcessingBlocks > 1) {
+                    return false;
+                }
             }
         }
         return true;
@@ -134,6 +143,7 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
         List<BlockPos> inputHatches = new ArrayList<>();
         List<BlockPos> outputHatches = new ArrayList<>();
         List<BlockPos> energyInputs = new ArrayList<>();
+        List<BlockPos> bulkProcessingBlocks = new ArrayList<>();
 
         for (BlockPos target : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
             BlockState state = level.getBlockState(target);
@@ -156,6 +166,10 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
                     if (be instanceof ReprocessorEnergyHatch) {
                         energyInputs.add(target.immutable());
                     }
+
+                    if (state.getBlock() instanceof ReprocessorBulkProcessingBlock) {
+                        bulkProcessingBlocks.add(target.immutable());
+                    }
                 }
             }
         }
@@ -164,6 +178,7 @@ public class ReprocessorControllerBlock extends BaseEntityBlock implements Repro
             controllerBE.setInputHatches(inputHatches);
             controllerBE.setOutputHatches(outputHatches);
             controllerBE.setEnergyInputs(energyInputs);
+            controllerBE.setBulkProcessingBlocks(bulkProcessingBlocks);
         }
     }
 }

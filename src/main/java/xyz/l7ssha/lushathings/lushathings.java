@@ -86,6 +86,7 @@ public class lushathings {
 
     public static final DeferredBlock<Block> REPROCESSOR_CONTROLLER_BLOCK = registerBlock("reprocessor_controller_block", () -> new ReprocessorControllerBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_STRUCTURE_BLOCK = registerBlock("reprocessor_structure_block", () -> new ReprocessorStructureBlock(BlockBehaviour.Properties.of()));
+    public static final DeferredBlock<Block> REPROCESSOR_BULK_PROCESSING_BLOCK = registerBlock("reprocessor_bulk_processing_block", () -> new ReprocessorBulkProcessingBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_INPUT_BLOCK = registerBlock("reprocessor_input_block", () -> new ReprocessorInputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_OUTPUT_BLOCK = registerBlock("reprocessor_output_block", () -> new ReprocessorOutputBlock(BlockBehaviour.Properties.of()));
     public static final DeferredBlock<Block> REPROCESSOR_INPUT_OUTPUT_BLOCK = registerBlock("reprocessor_input_output_block", () -> new ReprocessorInputOutputBlock(BlockBehaviour.Properties.of()));
@@ -157,6 +158,7 @@ public class lushathings {
             .displayItems((parameters, output) -> {
                 output.accept(REPROCESSOR_CONTROLLER_BLOCK.get());
                 output.accept(REPROCESSOR_STRUCTURE_BLOCK.get());
+                output.accept(REPROCESSOR_BULK_PROCESSING_BLOCK.get());
                 output.accept(REPROCESSOR_INPUT_BLOCK.get());
                 output.accept(REPROCESSOR_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_INPUT_OUTPUT_BLOCK.get());

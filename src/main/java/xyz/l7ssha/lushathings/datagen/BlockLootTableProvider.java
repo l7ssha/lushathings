@@ -26,6 +26,7 @@ public class BlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(lushathings.REPROCESSOR_INPUT_BLOCK.get());
         dropSelf(lushathings.REPROCESSOR_OUTPUT_BLOCK.get());
         dropSelf(lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK.get());
+        dropSelf(lushathings.REPROCESSOR_BULK_PROCESSING_BLOCK.get());
         dropSelf(lushathings.REPROCESSOR_ME_BLOCK.get());
         dropSelf(lushathings.REPROCESSOR_STRUCTURE_BLOCK.get());
         dropSelf(lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR.get());
