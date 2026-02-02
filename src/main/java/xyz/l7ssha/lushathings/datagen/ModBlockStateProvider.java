@@ -26,9 +26,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         setupFormedVariant(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK);
         setupFormedVariant(lushathings.REPROCESSOR_ME_BLOCK);
 
-        if (ModList.get().isLoaded("ars_nouveau")) {
-            setupEternalFireSourceRecombinator(lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR);
-        }
+        setupEternalFireSourceRecombinator(lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR);
     }
 
     private void setupFormedVariant(DeferredBlock<? extends Block> deferred) {
