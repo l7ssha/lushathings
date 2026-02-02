@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "S": {
+      "item": "lushathings:reprocessor_structure_block"
+    }
+  },
+  "pattern": [
+    "NDN",
+    "DSD",
+    "NDN"
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:reprocessor_bulk_processing_block"
+  }
+}

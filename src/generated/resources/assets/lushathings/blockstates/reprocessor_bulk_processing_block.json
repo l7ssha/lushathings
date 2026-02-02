@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "multiblock_formed=false": {
+      "model": "lushathings:block/reprocessor_bulk_processing_block"
+    },
+    "multiblock_formed=true": {
+      "model": "lushathings:block/reprocessor_bulk_processing_block_formed"
+    }
+  }
+}
