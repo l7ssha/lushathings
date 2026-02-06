@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -48,7 +47,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
     private int maxProgress = 600;
     private BlockPos centerPos = null;
     private int status = STATUS_NO_RECIPE;
-    private @Nullable ResourceLocation currentRecipeId = null;
+    private String currentRecipeOutputName = "";
     private int energyCostLastTick = 0;
 
     public ReprocessorControllerBlockEntity(BlockPos pos, BlockState blockState) {
@@ -173,12 +172,12 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         if (currentRecipe.isEmpty()) {
             this.status = STATUS_NO_RECIPE;
             this.progress = 0;
-            this.currentRecipeId = null;
+            setCurrentRecipeOutputName("");
             this.energyCostLastTick = 0;
             return;
         }
 
-        this.currentRecipeId = currentRecipe.get().id();
+        setCurrentRecipeOutputName(currentRecipe.get().value().output().getHoverName().getString());
 
         this.status = getCannotCraftReason(currentRecipe.get().value());
         if (this.status != STATUS_OK) {
@@ -211,7 +210,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         if (inputHatches.isEmpty()) {
             this.status = STATUS_NO_INPUT_HATCH;
             this.progress = 0;
-            this.currentRecipeId = null;
+            setCurrentRecipeOutputName("");
             this.energyCostLastTick = 0;
             return;
         }
@@ -219,7 +218,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         if (outputHatches.isEmpty()) {
             this.status = STATUS_NO_OUTPUT_HATCH;
             this.progress = 0;
-            this.currentRecipeId = null;
+            setCurrentRecipeOutputName("");
             this.energyCostLastTick = 0;
             return;
         }
@@ -227,8 +226,17 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         // TODO: Properly validate rest of structure
     }
 
-    public String getCurrentRecipeId() {
-        return currentRecipeId == null ? "None" : currentRecipeId.toString();
+    public String getCurrentRecipeOutputName() {
+        return currentRecipeOutputName;
+    }
+
+    private void setCurrentRecipeOutputName(String name) {
+        if (!this.currentRecipeOutputName.equals(name)) {
+            this.currentRecipeOutputName = name;
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
     }
 
     private Optional<RecipeHolder<ReprocessorRecipe>> findRecipe() {
@@ -435,6 +443,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
         tag.putInt("reprocessor.progress", progress);
         tag.putInt("reprocessor.maxProgress", maxProgress);
+        tag.putString("reprocessor.currentRecipeOutputName", currentRecipeOutputName);
         if (centerPos != null) {
             tag.putLong("reprocessor.centerPos", centerPos.asLong());
         }
@@ -451,6 +460,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
 
         progress = tag.getInt("reprocessor.progress");
         maxProgress = tag.getInt("reprocessor.maxProgress");
+        currentRecipeOutputName = tag.getString("reprocessor.currentRecipeOutputName");
 
         if (tag.contains("reprocessor.centerPos")) {
             this.centerPos = BlockPos.of(tag.getLong("reprocessor.centerPos"));

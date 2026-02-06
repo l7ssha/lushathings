@@ -9,6 +9,7 @@
   "block.lushathings.reprocessor_output_block": "Właz Wyjściowy Przetwornika",
   "block.lushathings.reprocessor_energy_input_block": "Wejście Energii Przetwornika",
   "block.lushathings.reprocessor_me_block": "Interfejs ME Przetwornika",
+  "block.lushathings.reprocessor_cc_adapter_block": "Adapter CC Przetwornika",
 
   "menu.lushathings.reprocessor_hatch": "Właz Przetwornika",
   "menu.lushathings.reprocessor_energy_input": "Wejście Energii Przetwornika",

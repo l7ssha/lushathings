@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_structure_block": {
+    "has_reprocessor": {
       "conditions": {
         "items": [
           {
-            "items": "lushathings:reprocessor_structure_block"
+            "items": "lushathings:reprocessor_controller_block"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_structure_block"
+      "has_reprocessor"
     ]
   ],
   "rewards": {

@@ -1,15 +1,43 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
+  "type": "lushathings:reprocessor",
+  "crafting_time": 300,
+  "energy_cost": 50000,
   "ingredients": [
     {
-      "item": "lushathings:reprocessor_input_block"
+      "count": 1,
+      "ingredient": {
+        "item": "lushathings:reprocessor_input_block"
+      }
     },
     {
-      "item": "lushathings:reprocessor_output_block"
+      "count": 1,
+      "ingredient": {
+        "item": "lushathings:reprocessor_output_block"
+      }
     },
     {
-      "item": "minecraft:diamond"
+      "count": 2,
+      "ingredient": {
+        "item": "minecraft:piston"
+      }
+    },
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "minecraft:sticky_piston"
+      }
+    },
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "minecraft:quartz"
+      }
+    },
+    {
+      "count": 3,
+      "ingredient": {
+        "item": "minecraft:redstone"
+      }
     }
   ],
   "result": {

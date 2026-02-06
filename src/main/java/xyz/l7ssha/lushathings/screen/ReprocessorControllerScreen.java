@@ -43,12 +43,12 @@ public class ReprocessorControllerScreen extends AbstractContainerScreen<Reproce
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        String recipeId = menu.blockEntity.getCurrentRecipeId();
+        String recipeName = menu.blockEntity.getCurrentRecipeOutputName();
         Component recipeComp;
-        if ("None".equals(recipeId)) {
+        if (recipeName.isEmpty()) {
             recipeComp = Component.translatable("lushathings.screen.reprocessor.recipe.none");
         } else {
-            recipeComp = Component.literal(recipeId);
+            recipeComp = Component.literal(recipeName);
         }
 
         guiGraphics.drawString(this.font,

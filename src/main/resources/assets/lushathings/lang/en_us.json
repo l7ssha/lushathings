@@ -11,6 +11,7 @@
   "block.lushathings.reprocessor_input_output_block": "Reprocessor Input/Output Hatch",
   "block.lushathings.reprocessor_energy_input_block": "Reprocessor Energy Input",
   "block.lushathings.reprocessor_me_block": "Reprocessor ME Interface",
+  "block.lushathings.reprocessor_cc_adapter_block": "Reprocessor CC Adapter",
 
   "menu.lushathings.reprocessor_hatch": "Reprocessor Hatch",
   "menu.lushathings.reprocessor_energy_input": "Reprocessor Energy Input",

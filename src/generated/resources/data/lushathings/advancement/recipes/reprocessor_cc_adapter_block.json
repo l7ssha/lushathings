@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_structure_block": {
+    "has_reprocessor": {
       "conditions": {
         "items": [
           {
-            "items": "lushathings:reprocessor_structure_block"
+            "items": "lushathings:reprocessor_controller_block"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "lushathings:reprocessor_me_block"
+        "recipe": "lushathings:reprocessor_cc_adapter_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_structure_block"
+      "has_reprocessor"
     ]
   ],
   "rewards": {
     "recipes": [
-      "lushathings:reprocessor_me_block"
+      "lushathings:reprocessor_cc_adapter_block"
     ]
   }
 }

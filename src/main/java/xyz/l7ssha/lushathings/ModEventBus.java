@@ -2,6 +2,7 @@ package xyz.l7ssha.lushathings;
 
 import appeng.api.AECapabilities;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
+import dan200.computercraft.api.peripheral.PeripheralCapability;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -62,6 +63,14 @@ public class ModEventBus {
                     CapabilityRegistry.SOURCE_CAPABILITY,
                     lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY.get(),
                     (be, context) -> be
+            );
+        }
+
+        if (ModList.get().isLoaded("computercraft")) {
+            event.registerBlockEntity(
+                    PeripheralCapability.get(),
+                    lushathings.REPROCESSOR_CC_ADAPTER_BLOCK_ENTITY.get(),
+                    (be, context) -> be.getPeripheral()
             );
         }
     }

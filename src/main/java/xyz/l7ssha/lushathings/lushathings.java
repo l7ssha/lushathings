@@ -34,7 +34,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import xyz.l7ssha.lushathings.blockentity.*;
+import xyz.l7ssha.lushathings.blockentity.ReprocessorCCAdapterBlockEntity;
 import xyz.l7ssha.lushathings.blocks.*;
+import xyz.l7ssha.lushathings.blocks.ReprocessorCCAdapterBlock;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
@@ -93,6 +95,7 @@ public class lushathings {
     public static final DeferredBlock<Block> REPROCESSOR_ENERGY_INPUT_BLOCK = registerBlock("reprocessor_energy_input_block", () -> new ReprocessorEnergyInputBlock(BlockBehaviour.Properties.of()));
     public static DeferredBlock<Block> ETERNAL_FIRE_SOURCE_RECOMBINATOR;
     public static DeferredBlock<Block> REPROCESSOR_ME_BLOCK;
+    public static DeferredBlock<Block> REPROCESSOR_CC_ADAPTER_BLOCK;
 
     public static final Supplier<BlockEntityType<ReprocessorControllerBlockEntity>> REPROCESSOR_CONTROLLER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "reprocessor_controller_block_entity",
@@ -116,6 +119,7 @@ public class lushathings {
     );
     public static Supplier<BlockEntityType<EternalFireSourceRecombinatorBlockEntity>> ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY;
     public static Supplier<BlockEntityType<ReprocessorMEBlockEntity>> REPROCESSOR_ME_BLOCK_ENTITY;
+    public static Supplier<BlockEntityType<ReprocessorCCAdapterBlockEntity>> REPROCESSOR_CC_ADAPTER_BLOCK_ENTITY;
 
     static {
         if (ModList.get().isLoaded("ae2")) {
@@ -133,6 +137,14 @@ public class lushathings {
             ETERNAL_FIRE_SOURCE_RECOMBINATOR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
                     "eternal_fire_source_recombinator_block_entity",
                     () -> BlockEntityType.Builder.of(EternalFireSourceRecombinatorBlockEntity::new, ETERNAL_FIRE_SOURCE_RECOMBINATOR.get()).build(null));
+        }
+
+        if (ModList.get().isLoaded("computercraft")) {
+            REPROCESSOR_CC_ADAPTER_BLOCK = registerBlock("reprocessor_cc_adapter_block", () -> new ReprocessorCCAdapterBlock(BlockBehaviour.Properties.of()));
+
+            REPROCESSOR_CC_ADAPTER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+                    "reprocessor_cc_adapter_block_entity",
+                    () -> BlockEntityType.Builder.of(ReprocessorCCAdapterBlockEntity::new, REPROCESSOR_CC_ADAPTER_BLOCK.get()).build(null));
         }
     }
 
@@ -163,8 +175,15 @@ public class lushathings {
                 output.accept(REPROCESSOR_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_INPUT_OUTPUT_BLOCK.get());
                 output.accept(REPROCESSOR_ENERGY_INPUT_BLOCK.get());
-                output.accept(ETERNAL_FIRE_SOURCE_RECOMBINATOR.get());
-                output.accept(REPROCESSOR_ME_BLOCK.get());
+                if (ETERNAL_FIRE_SOURCE_RECOMBINATOR != null) {
+                    output.accept(ETERNAL_FIRE_SOURCE_RECOMBINATOR.get());
+                }
+                if (REPROCESSOR_ME_BLOCK != null) {
+                    output.accept(REPROCESSOR_ME_BLOCK.get());
+                }
+                if (REPROCESSOR_CC_ADAPTER_BLOCK != null) {
+                    output.accept(REPROCESSOR_CC_ADAPTER_BLOCK.get());
+                }
             }).build());
 
     public lushathings(IEventBus modEventBus, ModContainer modContainer) {

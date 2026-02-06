@@ -2,7 +2,6 @@ package xyz.l7ssha.lushathings.datagen;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.model.generators.*;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -25,16 +24,27 @@ public class ModBlockStateProvider extends BlockStateProvider {
         setupFormedVariant(lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK);
         setupFormedVariant(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK);
         setupFormedVariant(lushathings.REPROCESSOR_ME_BLOCK);
+        setupFormedVariant(lushathings.REPROCESSOR_CC_ADAPTER_BLOCK);
 
         setupEternalFireSourceRecombinator(lushathings.ETERNAL_FIRE_SOURCE_RECOMBINATOR);
-    }
+        }
 
     private void setupFormedVariant(DeferredBlock<? extends Block> deferred) {
+        if (deferred == null) {
+            return;
+        }
+
         Block block = deferred.get();
         String name = deferred.getId().getPath();
 
-        ModelFile modelOff = models().cubeAll(name, blockTexture(block));
-        ModelFile modelOn = models().cubeAll(name + "_formed", modLoc("block/" + name + "_formed"));
+        // Some optional compat blocks may not have dedicated textures yet.
+        // Fall back to the structure block textures to keep datagen runnable.
+        boolean fallbackToStructureTexture = name.equals("reprocessor_cc_adapter_block");
+        var offTexture = fallbackToStructureTexture ? modLoc("block/reprocessor_structure_block") : blockTexture(block);
+        var onTexture = fallbackToStructureTexture ? modLoc("block/reprocessor_structure_block_formed") : modLoc("block/" + name + "_formed");
+
+        ModelFile modelOff = models().cubeAll(name, offTexture);
+        ModelFile modelOn = models().cubeAll(name + "_formed", onTexture);
 
         getVariantBuilder(block).partialState()
                 .with(ReprocessorMultiblock.MUTLIBLOCK_FORMED, false)

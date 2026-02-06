@@ -1,24 +1,38 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "I": {
-      "item": "lushathings:reprocessor_input_block"
+  "type": "lushathings:reprocessor",
+  "crafting_time": 300,
+  "energy_cost": 50000,
+  "ingredients": [
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "lushathings:reprocessor_input_output_block"
+      }
     },
-    "J": {
-      "item": "ae2:interface"
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "ae2:logic_processor"
+      }
     },
-    "O": {
-      "item": "lushathings:reprocessor_output_block"
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "ae2:blank_pattern"
+      }
     },
-    "P": {
-      "item": "ae2:pattern_provider"
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "ae2:pattern_provider"
+      }
+    },
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "ae2:interface"
+      }
     }
-  },
-  "pattern": [
-    " I ",
-    " O ",
-    "PJP"
   ],
   "result": {
     "count": 1,

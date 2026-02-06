@@ -19,6 +19,8 @@ public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implem
     private static final int MAX_FE_CONSUME_PER_TICK = 256_000;
 
     private int storedSource = 0;
+    private boolean hasSoulFire = false;
+    private boolean hasSoulSand = false;
 
     private final EnergyStorageWrapper energyStorage = new EnergyStorageWrapper(MAX_FE_STORAGE, MAX_FE_CONSUME_PER_TICK, () -> {
         setChanged();
@@ -73,19 +75,17 @@ public class EternalFireSourceRecombinatorBlockEntity extends BlockEntity implem
         }
 
         boolean isProcessing = false;
-        boolean hasSoulFire = false;
-        boolean hasSoulSand = false;
 
         if ((level.getGameTime() % 10L) == 0L) {
             BlockPos firePos = pos.below();
             BlockPos sandPos = firePos.below();
 
-            hasSoulFire = level.getBlockState(firePos).is(Blocks.SOUL_FIRE);
-            hasSoulSand = level.getBlockState(sandPos).is(Blocks.SOUL_SAND);
+            blockEntity.hasSoulFire = level.getBlockState(firePos).is(Blocks.SOUL_FIRE);
+            blockEntity.hasSoulSand = level.getBlockState(sandPos).is(Blocks.SOUL_SAND);
         }
 
         int remainingSourceSpace = SOURCE_GENERATE_PER_TICK - blockEntity.storedSource;
-        if (remainingSourceSpace > 0 && hasSoulFire && hasSoulSand) {
+        if (remainingSourceSpace > 0 && blockEntity.hasSoulFire && blockEntity.hasSoulSand) {
             long feNeededForRemaining = (long) Math.ceil(MAX_FE_CONSUME_PER_TICK * Math.pow(remainingSourceSpace / (double) SOURCE_GENERATE_PER_TICK, 2));
             int feToConsume = (int) Math.min(MAX_FE_CONSUME_PER_TICK, Math.min(Integer.MAX_VALUE, feNeededForRemaining));
 

@@ -67,6 +67,13 @@ repositories {
             includeGroup("top.theillusivec4.curios")
         }
     }
+
+    maven {
+        url "https://maven.squiddev.cc"
+        content {
+            includeGroup("cc.tweaked")
+        }
+    }
 }
 
 base {
@@ -167,6 +174,10 @@ dependencies {
 
     implementation("org.appliedenergistics:appliedenergistics2:${ae2_version}")
     implementation("com.hollingsworth.ars_nouveau:ars_nouveau-${minecraft_version}:${ars_version}")
+
+    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-core-api:$cctVersion")
+    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-forge-api:$cctVersion")
+    runtimeOnly("cc.tweaked:cc-tweaked-$minecraft_version-forge:$cctVersion")
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
