@@ -23,8 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.lushathings;
+import xyz.l7ssha.lushathings.blockentity.util.ReprocessorInventoryUtil;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
-import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 import xyz.l7ssha.lushathings.screen.ReprocessorControllerMenu;
 
 public class ReprocessorControllerBlockEntity extends BlockEntity implements MenuProvider {
@@ -200,25 +200,9 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
         continue;
       }
 
-      int possible = 4;
-      for (SizedIngredient ingredient : recipe.inputs()) {
-        int foundCount = 0;
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack stack = handler.getStackInSlot(i);
-          if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-            foundCount += stack.getCount();
-          }
-        }
-
-        possible = Math.min(possible, foundCount / ingredient.count());
-        if (possible <= 1) {
-          possible = Math.max(1, possible);
-          break;
-        }
-      }
-
+      int possible = ReprocessorInventoryUtil.computeMaxParallelCount(recipe, handler, 4);
       if (possible > best) {
-        best = Math.min(4, possible);
+        best = possible;
         if (best >= 4) {
           return 4;
         }
@@ -240,22 +224,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
       return false;
     }
 
-    int n = Math.max(1, Math.min(4, parallelCount));
-
-    ItemStack out1 = recipe.output().copy();
-    ItemStack out2 = recipe.output2().copy();
-
-    for (int i = 0; i < n; i++) {
-      if (!simulateInsert(out1)) {
-        return false;
-      }
-
-      if (!out2.isEmpty() && !simulateInsert(out2)) {
-        return false;
-      }
-    }
-
-    return true;
+    return ReprocessorInventoryUtil.canFitOutputs(recipe, outputHatches, level, parallelCount);
   }
 
   public void tick(Level level, BlockPos blockPos, BlockState blockState) {
@@ -358,25 +327,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
           continue;
         }
 
-        boolean allMatched = true;
-        for (SizedIngredient ingredient : recipe.inputs()) {
-          int required = ingredient.count();
-          int foundCount = 0;
-
-          for (int i = 0; i < handler.getSlots(); i++) {
-            ItemStack stack = handler.getStackInSlot(i);
-            if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-              foundCount += stack.getCount();
-            }
-          }
-
-          if (foundCount < required) {
-            allMatched = false;
-            break;
-          }
-        }
-
-        if (allMatched) {
+        if (ReprocessorInventoryUtil.hasAllIngredients(recipe, handler)) {
           return true;
         }
       }
@@ -393,88 +344,20 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
       var handler = hatch.getInputInventory();
       if (handler == null) continue;
 
-      boolean possibleHere = true;
-      for (SizedIngredient ingredient : recipe.inputs()) {
-        int required = ingredient.count() * n;
-        int foundCount = 0;
-
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack stack = handler.getStackInSlot(i);
-          if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-            foundCount += stack.getCount();
-          }
-        }
-
-        if (foundCount < required) {
-          possibleHere = false;
-          break;
-        }
-      }
-
-      if (!possibleHere) {
+      if (!ReprocessorInventoryUtil.hasAllIngredientsMultiplied(recipe, handler, n)) {
         continue;
       }
 
-      for (SizedIngredient ingredient : recipe.inputs()) {
-        int required = ingredient.count() * n;
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack stack = handler.getStackInSlot(i);
-          if (!stack.isEmpty() && ingredient.ingredient().test(stack)) {
-            int toTake = Math.min(stack.getCount(), required);
-            handler.extractItem(i, toTake, false);
-            required -= toTake;
-            if (required <= 0) {
-              break;
-            }
-          }
-        }
-      }
+      ReprocessorInventoryUtil.consumeIngredients(recipe, handler, n);
 
       for (int i = 0; i < n; i++) {
-        insertOutput(recipe.output().copy());
+        ReprocessorInventoryUtil.insertOutput(recipe.output().copy(), outputHatches, level);
         if (!recipe.output2().isEmpty()) {
-          insertOutput(recipe.output2().copy());
+          ReprocessorInventoryUtil.insertOutput(recipe.output2().copy(), outputHatches, level);
         }
       }
 
       return;
-    }
-  }
-
-  private void insertOutput(ItemStack stack) {
-    for (BlockPos outputPos : outputHatches) {
-      if (level.getBlockEntity(outputPos) instanceof ReprocessorIOHatch hatch) {
-        var handler = hatch.getOutputInventory();
-        if (handler == null) {
-          continue;
-        }
-
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack slotStack = handler.getStackInSlot(i);
-          if (slotStack.isEmpty()) {
-            int maxInsert = Math.min(stack.getCount(), handler.getSlotLimit(i));
-            if (maxInsert > 0) {
-              ItemStack toInsert = stack.copy();
-              toInsert.setCount(maxInsert);
-              handler.setStackInSlot(i, toInsert);
-              stack.shrink(maxInsert);
-              if (stack.isEmpty()) {
-                return;
-              }
-            }
-          } else if (ItemStack.isSameItem(slotStack, stack)) {
-            int spaceAvailable = handler.getSlotLimit(i) - slotStack.getCount();
-            if (spaceAvailable > 0) {
-              int toInsert = Math.min(stack.getCount(), spaceAvailable);
-              slotStack.grow(toInsert);
-              stack.shrink(toInsert);
-              if (stack.isEmpty()) {
-                return;
-              }
-            }
-          }
-        }
-      }
     }
   }
 
@@ -522,42 +405,7 @@ public class ReprocessorControllerBlockEntity extends BlockEntity implements Men
   }
 
   private boolean simulateInsert(ItemStack stack) {
-    ItemStack remaining = stack.copy();
-    for (BlockPos outputPos : outputHatches) {
-      if (level.getBlockEntity(outputPos) instanceof ReprocessorIOHatch hatch) {
-        var handler = hatch.getOutputInventory();
-        if (handler == null) {
-          continue;
-        }
-
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack slotStack = handler.getStackInSlot(i);
-          if (slotStack.isEmpty()) {
-            if (remaining.getCount() <= handler.getSlotLimit(i)) {
-              return true;
-            } else {
-              remaining = remaining.copy();
-              remaining.shrink(handler.getSlotLimit(i));
-              if (remaining.isEmpty()) {
-                return true;
-              }
-            }
-          } else if (ItemStack.isSameItem(slotStack, remaining)) {
-            int spaceAvailable = handler.getSlotLimit(i) - slotStack.getCount();
-            if (spaceAvailable > 0) {
-              int toInsert = Math.min(remaining.getCount(), spaceAvailable);
-              remaining = remaining.copy();
-              remaining.shrink(toInsert);
-              if (remaining.isEmpty()) {
-                return true;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return remaining.isEmpty();
+    return ReprocessorInventoryUtil.simulateInsertAcrossHatches(stack, outputHatches, level);
   }
 
   @Override
