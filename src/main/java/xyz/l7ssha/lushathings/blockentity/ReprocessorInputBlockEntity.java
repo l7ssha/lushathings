@@ -1,5 +1,7 @@
 package xyz.l7ssha.lushathings.blockentity;
 
+import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pullFromNeighbors;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -24,107 +26,111 @@ import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 import xyz.l7ssha.lushathings.screen.ReprocessorHatchMenu;
 
-import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pullFromNeighbors;
+public class ReprocessorInputBlockEntity extends BlockEntity
+    implements MenuProvider, ReprocessorIOHatch {
+  private final InventoryConfig inventoryConfig = new InventoryConfig();
 
-public class ReprocessorInputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorIOHatch {
-    private final InventoryConfig inventoryConfig = new InventoryConfig();
-
-    public final ItemStackHandler itemHandler = new ItemStackHandler(9) {
+  public final ItemStackHandler itemHandler =
+      new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
-            setChanged();
+          setChanged();
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            if (level == null) {
+          if (level == null) {
+            return true;
+          }
+
+          var recipes =
+              level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
+          for (var holder : recipes) {
+            for (SizedIngredient ingredient : holder.value().inputs()) {
+              if (ingredient.test(stack)) {
                 return true;
+              }
             }
+          }
 
-            var recipes = level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
-            for (var holder : recipes) {
-                for (SizedIngredient ingredient : holder.value().inputs()) {
-                    if (ingredient.test(stack)) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+          return false;
         }
-    };
+      };
 
-    public ReprocessorInputBlockEntity(BlockPos pos, BlockState blockState) {
-        super(lushathings.REPROCESSOR_INPUT_BLOCK_ENTITY.get(), pos, blockState);
+  public ReprocessorInputBlockEntity(BlockPos pos, BlockState blockState) {
+    super(lushathings.REPROCESSOR_INPUT_BLOCK_ENTITY.get(), pos, blockState);
+  }
+
+  public ItemStackHandler getItemHandler() {
+    return itemHandler;
+  }
+
+  @Override
+  public @Nullable ItemStackHandler getInputInventory() {
+    return itemHandler;
+  }
+
+  @Override
+  public @Nullable ItemStackHandler getOutputInventory() {
+    return null;
+  }
+
+  @Override
+  public InventoryConfig getInventoryConfig() {
+    return inventoryConfig;
+  }
+
+  @Override
+  public Component getDisplayName() {
+    return Component.translatable("block.lushathings.reprocessor_input_block");
+  }
+
+  @Override
+  public @Nullable AbstractContainerMenu createMenu(
+      int containerId, Inventory inventory, Player player) {
+    return new ReprocessorHatchMenu(containerId, inventory, this);
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.saveAdditional(tag, registries);
+    tag.put("inventory", itemHandler.serializeNBT(registries));
+    tag.put("inventoryConfig", inventoryConfig.serializeNBT());
+  }
+
+  @Override
+  protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.loadAdditional(tag, registries);
+
+    itemHandler.deserializeNBT(registries, tag.getCompound("inventory"));
+    inventoryConfig.deserializeNBT(tag.getCompound("inventoryConfig"));
+  }
+
+  public static void tick(
+      Level level, BlockPos pos, BlockState state, ReprocessorInputBlockEntity be) {
+    if (level.isClientSide || !be.inventoryConfig.isAutoPull() || level.getGameTime() % 20 != 0) {
+      return;
     }
 
-    public ItemStackHandler getItemHandler() {
-        return itemHandler;
+    for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
+      BlockPos neighborPos = pos.relative(dir);
+      IItemHandler neighbor =
+          level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+      if (neighbor == null) {
+        continue;
+      }
+
+      pullFromNeighbors(be, neighbor);
     }
+  }
 
-    @Override
-    public @Nullable ItemStackHandler getInputInventory() {
-        return itemHandler;
-    }
+  @Override
+  public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
 
-    @Override
-    public @Nullable ItemStackHandler getOutputInventory() {
-        return null;
-    }
-
-    @Override
-    public InventoryConfig getInventoryConfig() {
-        return inventoryConfig;
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("block.lushathings.reprocessor_input_block");
-    }
-
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new ReprocessorHatchMenu(containerId, inventory, this);
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("inventory", itemHandler.serializeNBT(registries));
-        tag.put("inventoryConfig", inventoryConfig.serializeNBT());
-    }
-
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-
-        itemHandler.deserializeNBT(registries, tag.getCompound("inventory"));
-        inventoryConfig.deserializeNBT(tag.getCompound("inventoryConfig"));
-    }
-
-    public static void tick(Level level, BlockPos pos, BlockState state, ReprocessorInputBlockEntity be) {
-        if (level.isClientSide || !be.inventoryConfig.isAutoPull() || level.getGameTime() % 20 != 0) {
-            return;
-        }
-
-        for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
-            BlockPos neighborPos = pos.relative(dir);
-            IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
-            if (neighbor == null) {
-                continue;
-            }
-
-            pullFromNeighbors(be, neighbor);
-        }
-    }
-
-    @Override
-    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    return saveWithoutMetadata(registries);
+  }
 }

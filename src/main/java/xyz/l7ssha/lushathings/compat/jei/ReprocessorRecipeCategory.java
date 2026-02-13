@@ -1,5 +1,7 @@
 package xyz.l7ssha.lushathings.compat.jei;
 
+import java.util.Arrays;
+import java.util.List;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -18,87 +20,104 @@ import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.ReprocessorRecipe;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ReprocessorRecipeCategory implements IRecipeCategory<ReprocessorRecipe> {
-    public static final RecipeType<ReprocessorRecipe> RECIPE_TYPE = RecipeType.create(lushathings.MODID, "reprocessor", ReprocessorRecipe.class);
+  public static final RecipeType<ReprocessorRecipe> RECIPE_TYPE =
+      RecipeType.create(lushathings.MODID, "reprocessor", ReprocessorRecipe.class);
 
-    private final IDrawable background;
-    private final IDrawable icon;
+  private final IDrawable background;
+  private final IDrawable icon;
 
-    public ReprocessorRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_gui.png"), 5, 5, 165, 75);
+  public ReprocessorRecipeCategory(IGuiHelper helper) {
+    this.background =
+        helper.createDrawable(
+            ResourceLocation.fromNamespaceAndPath(
+                lushathings.MODID, "textures/gui/reprocessor_gui.png"),
+            5,
+            5,
+            165,
+            75);
 
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get()));
+    this.icon =
+        helper.createDrawableIngredient(
+            VanillaTypes.ITEM_STACK, new ItemStack(lushathings.REPROCESSOR_CONTROLLER_BLOCK.get()));
+  }
+
+  @Override
+  public RecipeType<ReprocessorRecipe> getRecipeType() {
+    return RECIPE_TYPE;
+  }
+
+  @Override
+  public Component getTitle() {
+    return Component.translatable("block.lushathings.reprocessor_controller_block");
+  }
+
+  @Override
+  public int getWidth() {
+    return this.background.getWidth();
+  }
+
+  @Override
+  public int getHeight() {
+    return this.background.getHeight();
+  }
+
+  @Override
+  public IDrawable getIcon() {
+    return icon;
+  }
+
+  @Override
+  public void setRecipe(
+      IRecipeLayoutBuilder builder, ReprocessorRecipe recipe, IFocusGroup focuses) {
+    int x = 3;
+    int y = 12;
+
+    // Inputs
+    for (int i = 0; i < recipe.inputs().size(); i++) {
+      SizedIngredient input = recipe.inputs().get(i);
+      List<ItemStack> stacks =
+          Arrays.stream(input.ingredient().getItems())
+              .map(
+                  itemStack -> {
+                    ItemStack copy = itemStack.copy();
+                    copy.setCount(input.count());
+                    return copy;
+                  })
+              .toList();
+
+      builder
+          .addSlot(RecipeIngredientRole.INPUT, x + (i * 18), y)
+          .addIngredients(VanillaTypes.ITEM_STACK, stacks);
     }
 
-    @Override
-    public RecipeType<ReprocessorRecipe> getRecipeType() {
-        return RECIPE_TYPE;
+    // Outputs
+    int outX = 111;
+
+    builder.addSlot(RecipeIngredientRole.OUTPUT, outX, y).addItemStack(recipe.output());
+
+    if (!recipe.output2().isEmpty()) {
+      builder.addSlot(RecipeIngredientRole.OUTPUT, outX + 18, y).addItemStack(recipe.output2());
     }
+  }
 
-    @Override
-    public Component getTitle() {
-        return Component.translatable("block.lushathings.reprocessor_controller_block");
-    }
+  @Override
+  public void draw(
+      ReprocessorRecipe recipe,
+      @NotNull IRecipeSlotsView recipeSlotsView,
+      @NotNull GuiGraphics guiGraphics,
+      double mouseX,
+      double mouseY) {
+    this.background.draw(guiGraphics);
 
-    @Override
-    public int getWidth() {
-        return this.background.getWidth();
-    }
+    // Draw Energy Cost
+    Component energyText = Component.literal(recipe.energyCost() + " FE");
+    guiGraphics.drawString(
+        net.minecraft.client.Minecraft.getInstance().font, energyText, 10, 70, 0xFF0000, false);
 
-    @Override
-    public int getHeight() {
-        return this.background.getHeight();
-    }
-
-    @Override
-    public IDrawable getIcon() {
-        return icon;
-    }
-
-    @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ReprocessorRecipe recipe, IFocusGroup focuses) {
-        int x = 3;
-        int y = 12;
-
-        // Inputs
-        for (int i = 0; i < recipe.inputs().size(); i++) {
-            SizedIngredient input = recipe.inputs().get(i);
-            List<ItemStack> stacks = Arrays.stream(input.ingredient().getItems())
-                    .map(itemStack -> {
-                        ItemStack copy = itemStack.copy();
-                        copy.setCount(input.count());
-                        return copy;
-                    }).toList();
-
-            builder.addSlot(RecipeIngredientRole.INPUT, x + (i * 18), y)
-                    .addIngredients(VanillaTypes.ITEM_STACK, stacks);
-        }
-
-        // Outputs
-        int outX = 111;
-
-        builder.addSlot(RecipeIngredientRole.OUTPUT, outX, y)
-                .addItemStack(recipe.output());
-
-        if (!recipe.output2().isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.OUTPUT, outX + 18, y)
-                    .addItemStack(recipe.output2());
-        }
-    }
-
-    @Override
-    public void draw(ReprocessorRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, @NotNull GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        this.background.draw(guiGraphics);
-
-        // Draw Energy Cost
-        Component energyText = Component.literal(recipe.energyCost() + " FE");
-        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, energyText, 10, 70, 0xFF0000, false);
-
-        // Draw Crafting Time
-        Component timeText = Component.literal(recipe.craftingTime() + " ticks");
-        guiGraphics.drawString(net.minecraft.client.Minecraft.getInstance().font, timeText, 100, 70, 0x404040, false);
-    }
+    // Draw Crafting Time
+    Component timeText = Component.literal(recipe.craftingTime() + " ticks");
+    guiGraphics.drawString(
+        net.minecraft.client.Minecraft.getInstance().font, timeText, 100, 70, 0x404040, false);
+  }
 }

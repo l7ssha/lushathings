@@ -7,11 +7,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 
-public class ReprocessorStructureBlock extends Block implements ReprocessorMultiblock {
-  public static final MapCodec<ReprocessorStructureBlock> CODEC =
-      simpleCodec(ReprocessorStructureBlock::new);
+public class ReprocessorParallelProcessorBlock extends Block implements ReprocessorMultiblock {
+  public static final MapCodec<ReprocessorParallelProcessorBlock> CODEC =
+      simpleCodec(ReprocessorParallelProcessorBlock::new);
 
-  public ReprocessorStructureBlock(Properties properties) {
+  public ReprocessorParallelProcessorBlock(Properties properties) {
     super(properties);
     this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
   }

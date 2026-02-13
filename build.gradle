@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.137'
     id 'idea'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -235,6 +236,17 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+spotless {
+    java {
+        googleJavaFormat('1.22.0')
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn 'spotlessCheck'
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.

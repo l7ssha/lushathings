@@ -5,6 +5,7 @@
 
   "block.lushathings.reprocessor_controller_block": "Sterownik Przetwornika",
   "block.lushathings.reprocessor_structure_block": "Blok Strukturalny Przetwornika",
+  "block.lushathings.reprocessor_parallel_processor_block": "Procesor Równoległy Przetwornika",
   "block.lushathings.reprocessor_input_block": "Właz Wejściowy Przetwornika",
   "block.lushathings.reprocessor_output_block": "Właz Wyjściowy Przetwornika",
   "block.lushathings.reprocessor_energy_input_block": "Wejście Energii Przetwornika",

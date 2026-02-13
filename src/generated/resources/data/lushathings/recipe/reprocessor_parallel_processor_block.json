@@ -1,0 +1,35 @@
+{
+  "type": "lushathings:reprocessor",
+  "crafting_time": 300,
+  "energy_cost": 50000,
+  "ingredients": [
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "lushathings:reprocessor_bulk_processing_block"
+      }
+    },
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "minecraft:redstone_block"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "minecraft:repeater"
+      }
+    },
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "minecraft:comparator"
+      }
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "lushathings:reprocessor_parallel_processor_block"
+  }
+}

@@ -17,70 +17,83 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorInputOutputBlockEntity;
+import xyz.l7ssha.lushathings.lushathings;
 
 public class ReprocessorInputOutputBlock extends BaseEntityBlock implements ReprocessorMultiblock {
-    public static final MapCodec<ReprocessorInputOutputBlock> CODEC = simpleCodec(ReprocessorInputOutputBlock::new);
+  public static final MapCodec<ReprocessorInputOutputBlock> CODEC =
+      simpleCodec(ReprocessorInputOutputBlock::new);
 
-    public ReprocessorInputOutputBlock(Properties properties) {
-        super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
+  public ReprocessorInputOutputBlock(Properties properties) {
+    super(properties);
+    this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
+  }
+
+  @Override
+  protected MapCodec<? extends BaseEntityBlock> codec() {
+    return CODEC;
+  }
+
+  @Override
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    builder.add(MUTLIBLOCK_FORMED);
+  }
+
+  @Override
+  protected RenderShape getRenderShape(BlockState state) {
+    return RenderShape.MODEL;
+  }
+
+  @Nullable
+  @Override
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new ReprocessorInputOutputBlockEntity(pos, state);
+  }
+
+  @Nullable
+  @Override
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+      Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+    if (level.isClientSide()) {
+      return null;
+    }
+    return createTickerHelper(
+        blockEntityType,
+        lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(),
+        ReprocessorInputOutputBlockEntity::tick);
+  }
+
+  @Override
+  protected void onRemove(
+      BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    if (!state.is(newState.getBlock())) {
+      if (state.getValue(MUTLIBLOCK_FORMED)) {
+        unformEntireMultiblock(level, pos);
+      }
+      super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+  }
+
+  @Override
+  protected ItemInteractionResult useItemOn(
+      ItemStack stack,
+      BlockState state,
+      Level level,
+      BlockPos pos,
+      Player player,
+      InteractionHand hand,
+      BlockHitResult hitResult) {
+    if (!state.getValue(MUTLIBLOCK_FORMED)) {
+      return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
+    if (!level.isClientSide) {
+      BlockEntity be = level.getBlockEntity(pos);
+      if (be instanceof ReprocessorInputOutputBlockEntity) {
+        player.openMenu((ReprocessorInputOutputBlockEntity) be, pos);
+      }
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(MUTLIBLOCK_FORMED);
-    }
-
-    @Override
-    protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ReprocessorInputOutputBlockEntity(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        if (level.isClientSide()) {
-            return null;
-        }
-        return createTickerHelper(blockEntityType, lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(), ReprocessorInputOutputBlockEntity::tick);
-    }
-
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
-            if (state.getValue(MUTLIBLOCK_FORMED)) {
-                unformEntireMultiblock(level, pos);
-            }
-            super.onRemove(state, level, pos, newState, movedByPiston);
-        }
-    }
-
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!state.getValue(MUTLIBLOCK_FORMED)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        }
-
-        if (!level.isClientSide) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ReprocessorInputOutputBlockEntity) {
-                player.openMenu((ReprocessorInputOutputBlockEntity) be, pos);
-            }
-        }
-
-        return ItemInteractionResult.CONSUME;
-    }
+    return ItemInteractionResult.CONSUME;
+  }
 }

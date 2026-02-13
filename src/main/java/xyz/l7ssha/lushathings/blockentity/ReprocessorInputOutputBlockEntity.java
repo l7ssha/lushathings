@@ -1,5 +1,8 @@
 package xyz.l7ssha.lushathings.blockentity;
 
+import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pullFromNeighbors;
+import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pushToNeighbors;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -27,126 +30,129 @@ import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.recipe.util.SizedIngredient;
 import xyz.l7ssha.lushathings.screen.ReprocessorInputOutputMenu;
 
-import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pullFromNeighbors;
-import static xyz.l7ssha.lushathings.blockentity.util.ReprocessorItemHandlerHelper.pushToNeighbors;
+public class ReprocessorInputOutputBlockEntity extends BlockEntity
+    implements MenuProvider, ReprocessorIOHatch {
+  private final InventoryConfig inventoryConfig = new InventoryConfig();
 
-public class ReprocessorInputOutputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorIOHatch {
-    private final InventoryConfig inventoryConfig = new InventoryConfig();
-
-    public final ItemStackHandler inputHandler = new ItemStackHandler(9) {
+  public final ItemStackHandler inputHandler =
+      new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
-            setChanged();
+          setChanged();
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            if (level == null) {
+          if (level == null) {
+            return true;
+          }
+
+          var recipes =
+              level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
+          for (var holder : recipes) {
+            for (SizedIngredient ingredient : holder.value().inputs()) {
+              if (ingredient.test(stack)) {
                 return true;
+              }
             }
+          }
 
-            var recipes = level.getRecipeManager().getAllRecipesFor(lushathings.REPROCESSOR_RECIPE_TYPE.get());
-            for (var holder : recipes) {
-                for (SizedIngredient ingredient : holder.value().inputs()) {
-                    if (ingredient.test(stack)) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+          return false;
         }
-    };
+      };
 
-    public final ItemStackHandler outputHandler = new ItemStackHandler(9) {
+  public final ItemStackHandler outputHandler =
+      new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
-            setChanged();
+          setChanged();
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return false;
+          return false;
         }
-    };
+      };
 
-    public ReprocessorInputOutputBlockEntity(BlockPos pos, BlockState blockState) {
-        super(lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(), pos, blockState);
+  public ReprocessorInputOutputBlockEntity(BlockPos pos, BlockState blockState) {
+    super(lushathings.REPROCESSOR_INPUT_OUTPUT_BLOCK_ENTITY.get(), pos, blockState);
+  }
+
+  @Override
+  public @Nullable IItemHandlerModifiable getInputInventory() {
+    return this.inputHandler;
+  }
+
+  @Override
+  public @Nullable IItemHandlerModifiable getOutputInventory() {
+    return this.outputHandler;
+  }
+
+  public @Nullable IItemHandlerModifiable getCombinedInventory() {
+    return new CombinedInvWrapper(this.inputHandler, this.outputHandler);
+  }
+
+  @Override
+  public Component getDisplayName() {
+    return Component.translatable("block.lushathings.reprocessor_input_output_block");
+  }
+
+  @Override
+  public InventoryConfig getInventoryConfig() {
+    return inventoryConfig;
+  }
+
+  @Override
+  public @Nullable AbstractContainerMenu createMenu(
+      int containerId, Inventory inventory, Player player) {
+    return new ReprocessorInputOutputMenu(containerId, inventory, this);
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.saveAdditional(tag, registries);
+    tag.put("inputInventory", inputHandler.serializeNBT(registries));
+    tag.put("outputInventory", outputHandler.serializeNBT(registries));
+    tag.put("inventoryConfig", inventoryConfig.serializeNBT());
+  }
+
+  @Override
+  protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.loadAdditional(tag, registries);
+
+    inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
+    outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
+    inventoryConfig.deserializeNBT(tag.getCompound("inventoryConfig"));
+  }
+
+  @Override
+  public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
+
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    return saveWithoutMetadata(registries);
+  }
+
+  public static void tick(
+      Level level, BlockPos pos, BlockState state, ReprocessorInputOutputBlockEntity be) {
+    if (level.isClientSide || level.getGameTime() % 20 != 0) {
+      return;
     }
 
-    @Override
-    public @Nullable IItemHandlerModifiable getInputInventory() {
-        return this.inputHandler;
-    }
-
-    @Override
-    public @Nullable IItemHandlerModifiable getOutputInventory() {
-        return this.outputHandler;
-    }
-
-    public @Nullable IItemHandlerModifiable getCombinedInventory() {
-        return new CombinedInvWrapper(this.inputHandler, this.outputHandler);
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("block.lushathings.reprocessor_input_output_block");
-    }
-
-    @Override
-    public InventoryConfig getInventoryConfig() {
-        return inventoryConfig;
-    }
-
-
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new ReprocessorInputOutputMenu(containerId, inventory, this);
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("inputInventory", inputHandler.serializeNBT(registries));
-        tag.put("outputInventory", outputHandler.serializeNBT(registries));
-        tag.put("inventoryConfig", inventoryConfig.serializeNBT());
-    }
-
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-
-        inputHandler.deserializeNBT(registries, tag.getCompound("inputInventory"));
-        outputHandler.deserializeNBT(registries, tag.getCompound("outputInventory"));
-        inventoryConfig.deserializeNBT(tag.getCompound("inventoryConfig"));
-    }
-
-    @Override
-    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
-
-    public static void tick(Level level, BlockPos pos, BlockState state, ReprocessorInputOutputBlockEntity be) {
-        if (level.isClientSide || level.getGameTime() % 20 != 0) {
-            return;
+    if (be.inventoryConfig.isAutoPull() || be.inventoryConfig.isAutoPush()) {
+      for (Direction dir : Direction.values()) {
+        BlockPos neighborPos = pos.relative(dir);
+        IItemHandler neighbor =
+            level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+        if (neighbor == null) {
+          continue;
         }
 
-        if (be.inventoryConfig.isAutoPull() || be.inventoryConfig.isAutoPush()) {
-            for (Direction dir : Direction.values()) {
-                BlockPos neighborPos = pos.relative(dir);
-                IItemHandler neighbor = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
-                if (neighbor == null) {
-                    continue;
-                }
-
-                pullFromNeighbors(be, neighbor);
-                pushToNeighbors(be, neighbor);
-            }
-        }
+        pullFromNeighbors(be, neighbor);
+        pushToNeighbors(be, neighbor);
+      }
     }
+  }
 }

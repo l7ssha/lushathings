@@ -19,95 +19,102 @@ import xyz.l7ssha.lushathings.EnergyStorageWrapper;
 import xyz.l7ssha.lushathings.lushathings;
 import xyz.l7ssha.lushathings.screen.ReprocessorEnergyInputMenu;
 
-public class ReprocessorEnergyInputBlockEntity extends BlockEntity implements MenuProvider, ReprocessorEnergyHatch {
-    private final EnergyStorageWrapper energyStorage = new EnergyStorageWrapper(30000000, 150000, () -> {
-        setChanged();
-        if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
-    });
+public class ReprocessorEnergyInputBlockEntity extends BlockEntity
+    implements MenuProvider, ReprocessorEnergyHatch {
+  private final EnergyStorageWrapper energyStorage =
+      new EnergyStorageWrapper(
+          30000000,
+          150000,
+          () -> {
+            setChanged();
+            if (level != null && !level.isClientSide) {
+              level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+          });
 
-    private final IEnergyStorage externalEnergyStorage = new IEnergyStorage() {
+  private final IEnergyStorage externalEnergyStorage =
+      new IEnergyStorage() {
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
-            return energyStorage.receiveEnergy(maxReceive, simulate);
+          return energyStorage.receiveEnergy(maxReceive, simulate);
         }
 
         @Override
         public int extractEnergy(int maxExtract, boolean simulate) {
-            return 0;
+          return 0;
         }
 
         @Override
         public int getEnergyStored() {
-            return energyStorage.getEnergyStored();
+          return energyStorage.getEnergyStored();
         }
 
         @Override
         public int getMaxEnergyStored() {
-            return energyStorage.getMaxEnergyStored();
+          return energyStorage.getMaxEnergyStored();
         }
 
         @Override
         public boolean canExtract() {
-            return false;
+          return false;
         }
 
         @Override
         public boolean canReceive() {
-            return true;
+          return true;
         }
-    };
+      };
 
-    public ReprocessorEnergyInputBlockEntity(BlockPos pos, BlockState blockState) {
-        super(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK_ENTITY.get(), pos, blockState);
-    }
+  public ReprocessorEnergyInputBlockEntity(BlockPos pos, BlockState blockState) {
+    super(lushathings.REPROCESSOR_ENERGY_INPUT_BLOCK_ENTITY.get(), pos, blockState);
+  }
 
-    public IEnergyStorage getEnergyStorage() {
-        return externalEnergyStorage;
-    }
+  public IEnergyStorage getEnergyStorage() {
+    return externalEnergyStorage;
+  }
 
-    @Override
-    public int extractEnergyInternal(int maxExtract, boolean simulate) {
-        return energyStorage.extractEnergy(maxExtract, simulate);
-    }
+  @Override
+  public int extractEnergyInternal(int maxExtract, boolean simulate) {
+    return energyStorage.extractEnergy(maxExtract, simulate);
+  }
 
-    @Override
-    public int getEnergyStored() {
-        return energyStorage.getEnergyStored();
-    }
+  @Override
+  public int getEnergyStored() {
+    return energyStorage.getEnergyStored();
+  }
 
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("block.lushathings.reprocessor_energy_input_block");
-    }
+  @Override
+  public Component getDisplayName() {
+    return Component.translatable("block.lushathings.reprocessor_energy_input_block");
+  }
 
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new ReprocessorEnergyInputMenu(containerId, inventory, this);
-    }
+  @Override
+  public @Nullable AbstractContainerMenu createMenu(
+      int containerId, Inventory inventory, Player player) {
+    return new ReprocessorEnergyInputMenu(containerId, inventory, this);
+  }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("reprocessor.energy", energyStorage.serializeNBT(registries));
-    }
+  @Override
+  protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.saveAdditional(tag, registries);
+    tag.put("reprocessor.energy", energyStorage.serializeNBT(registries));
+  }
 
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("reprocessor.energy")) {
-            energyStorage.deserializeNBT(registries, tag.get("reprocessor.energy"));
-        }
+  @Override
+  protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    super.loadAdditional(tag, registries);
+    if (tag.contains("reprocessor.energy")) {
+      energyStorage.deserializeNBT(registries, tag.get("reprocessor.energy"));
     }
+  }
 
-    @Override
-    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+  @Override
+  public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
-    }
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    return saveWithoutMetadata(registries);
+  }
 }

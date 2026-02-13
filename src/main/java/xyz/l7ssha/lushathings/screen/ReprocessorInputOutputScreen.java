@@ -9,84 +9,100 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import xyz.l7ssha.lushathings.lushathings;
 
-public class ReprocessorInputOutputScreen extends AbstractContainerScreen<ReprocessorInputOutputMenu> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(lushathings.MODID, "textures/gui/reprocessor_input_output_gui.png");
-    private net.minecraft.client.gui.components.Button autoPullButton;
-    private net.minecraft.client.gui.components.Button autoPushButton;
+public class ReprocessorInputOutputScreen
+    extends AbstractContainerScreen<ReprocessorInputOutputMenu> {
+  private static final ResourceLocation TEXTURE =
+      ResourceLocation.fromNamespaceAndPath(
+          lushathings.MODID, "textures/gui/reprocessor_input_output_gui.png");
+  private net.minecraft.client.gui.components.Button autoPullButton;
+  private net.minecraft.client.gui.components.Button autoPushButton;
 
-    public ReprocessorInputOutputScreen(ReprocessorInputOutputMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 166;
-    }
+  public ReprocessorInputOutputScreen(
+      ReprocessorInputOutputMenu menu, Inventory playerInventory, Component title) {
+    super(menu, playerInventory, title);
+    this.imageWidth = 176;
+    this.imageHeight = 166;
+  }
 
-    @Override
-    protected void init() {
-        super.init();
-        int relX = (this.width - this.imageWidth) / 2;
-        int relY = (this.height - this.imageHeight) / 2;
+  @Override
+  protected void init() {
+    super.init();
+    int relX = (this.width - this.imageWidth) / 2;
+    int relY = (this.height - this.imageHeight) / 2;
 
-        this.autoPullButton = this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
-                getAutoPullText(),
-                button -> {
-                    if (this.minecraft != null && this.minecraft.gameMode != null) {
-                        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 0);
-                    }
-                })
+    this.autoPullButton =
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                    getAutoPullText(),
+                    button -> {
+                      if (this.minecraft != null && this.minecraft.gameMode != null) {
+                        this.minecraft.gameMode.handleInventoryButtonClick(
+                            this.menu.containerId, 0);
+                      }
+                    })
                 .bounds(relX + 120, relY + 18, 50, 20)
                 .build());
 
-        this.autoPushButton = this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
-                getAutoPushText(),
-                button -> {
-                    if (this.minecraft != null && this.minecraft.gameMode != null) {
-                        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 1);
-                    }
-                })
+    this.autoPushButton =
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                    getAutoPushText(),
+                    button -> {
+                      if (this.minecraft != null && this.minecraft.gameMode != null) {
+                        this.minecraft.gameMode.handleInventoryButtonClick(
+                            this.menu.containerId, 1);
+                      }
+                    })
                 .bounds(relX + 120, relY + 40, 50, 20)
                 .build());
-    }
+  }
 
-    @Override
-    protected void containerTick() {
-        super.containerTick();
-        if (this.autoPullButton != null) {
-            this.autoPullButton.setMessage(getAutoPullText());
-        }
-        if (this.autoPushButton != null) {
-            this.autoPushButton.setMessage(getAutoPushText());
-        }
+  @Override
+  protected void containerTick() {
+    super.containerTick();
+    if (this.autoPullButton != null) {
+      this.autoPullButton.setMessage(getAutoPullText());
     }
-
-    private Component getAutoPullText() {
-        boolean enabled = this.menu.isAutoPullEnabled();
-        Component typeComp = Component.translatable("lushathings.screen.hatch.pull");
-        Component stateComp = enabled ? Component.translatable("lushathings.screen.hatch.on") : Component.translatable("lushathings.screen.hatch.off");
-        return Component.translatable("lushathings.screen.hatch.auto_btn", typeComp, stateComp);
+    if (this.autoPushButton != null) {
+      this.autoPushButton.setMessage(getAutoPushText());
     }
+  }
 
-    private Component getAutoPushText() {
-        boolean enabled = this.menu.isAutoPushEnabled();
-        Component typeComp = Component.translatable("lushathings.screen.hatch.push");
-        Component stateComp = enabled ? Component.translatable("lushathings.screen.hatch.on") : Component.translatable("lushathings.screen.hatch.off");
-        return Component.translatable("lushathings.screen.hatch.auto_btn", typeComp, stateComp);
-    }
+  private Component getAutoPullText() {
+    boolean enabled = this.menu.isAutoPullEnabled();
+    Component typeComp = Component.translatable("lushathings.screen.hatch.pull");
+    Component stateComp =
+        enabled
+            ? Component.translatable("lushathings.screen.hatch.on")
+            : Component.translatable("lushathings.screen.hatch.off");
+    return Component.translatable("lushathings.screen.hatch.auto_btn", typeComp, stateComp);
+  }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
+  private Component getAutoPushText() {
+    boolean enabled = this.menu.isAutoPushEnabled();
+    Component typeComp = Component.translatable("lushathings.screen.hatch.push");
+    Component stateComp =
+        enabled
+            ? Component.translatable("lushathings.screen.hatch.on")
+            : Component.translatable("lushathings.screen.hatch.off");
+    return Component.translatable("lushathings.screen.hatch.auto_btn", typeComp, stateComp);
+  }
 
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+  @Override
+  public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+    super.render(guiGraphics, mouseX, mouseY, partialTick);
+    this.renderTooltip(guiGraphics, mouseX, mouseY);
+  }
 
-        int x = (this.width - this.imageWidth) / 2;
-        int y = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
-    }
+  @Override
+  protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+    RenderSystem.setShaderTexture(0, TEXTURE);
+
+    int x = (this.width - this.imageWidth) / 2;
+    int y = (this.height - this.imageHeight) / 2;
+    guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+  }
 }

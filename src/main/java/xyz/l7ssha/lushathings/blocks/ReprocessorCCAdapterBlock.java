@@ -13,41 +13,43 @@ import org.jetbrains.annotations.Nullable;
 import xyz.l7ssha.lushathings.blockentity.ReprocessorCCAdapterBlockEntity;
 
 public class ReprocessorCCAdapterBlock extends BaseEntityBlock implements ReprocessorMultiblock {
-    public static final MapCodec<ReprocessorCCAdapterBlock> CODEC = simpleCodec(ReprocessorCCAdapterBlock::new);
+  public static final MapCodec<ReprocessorCCAdapterBlock> CODEC =
+      simpleCodec(ReprocessorCCAdapterBlock::new);
 
-    public ReprocessorCCAdapterBlock(Properties properties) {
-        super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
-    }
+  public ReprocessorCCAdapterBlock(Properties properties) {
+    super(properties);
+    this.registerDefaultState(this.stateDefinition.any().setValue(MUTLIBLOCK_FORMED, false));
+  }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
+  @Override
+  protected MapCodec<? extends BaseEntityBlock> codec() {
+    return CODEC;
+  }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
-            if (state.getValue(MUTLIBLOCK_FORMED)) {
-                unformEntireMultiblock(level, pos);
-            }
-            super.onRemove(state, level, pos, newState, movedByPiston);
-        }
+  @Override
+  protected void onRemove(
+      BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    if (!state.is(newState.getBlock())) {
+      if (state.getValue(MUTLIBLOCK_FORMED)) {
+        unformEntireMultiblock(level, pos);
+      }
+      super.onRemove(state, level, pos, newState, movedByPiston);
     }
+  }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(MUTLIBLOCK_FORMED);
-    }
+  @Override
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    builder.add(MUTLIBLOCK_FORMED);
+  }
 
-    @Override
-    protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
+  @Override
+  protected RenderShape getRenderShape(BlockState state) {
+    return RenderShape.MODEL;
+  }
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ReprocessorCCAdapterBlockEntity(pos, state);
-    }
+  @Nullable
+  @Override
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new ReprocessorCCAdapterBlockEntity(pos, state);
+  }
 }
